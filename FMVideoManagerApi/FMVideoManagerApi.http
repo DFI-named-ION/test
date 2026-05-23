@@ -1,0 +1,6 @@
+@FMVideoManagerApi_HostAddress = http://localhost:5150
+
+GET {{FMVideoManagerApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

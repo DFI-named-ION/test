@@ -1,0 +1,28 @@
+﻿<UserControl x:Class="FMVideoManagerApp.Components.LogInComponent.LogInComponent"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FMVideoManagerApp.Components.LogInComponent"
+             xmlns:viewModels="clr-namespace:FMVideoManagerApp.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=viewModels:LogInViewModel}"
+             d:DesignHeight="630" d:DesignWidth="1000">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="LogInComponentStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <StackPanel>
+        <TextBox
+            Text="{Binding Login, Mode=TwoWay}"
+            Margin="0px 175px 0px 0px"/>
+        <TextBox 
+            Text="{Binding Password, Mode=TwoWay}"
+            Margin="0px 50px 0px 0px"/>
+        <Button Content="Log in" Command="{Binding LogInCommand}"/>
+        <Button Content="Register" Command="{Binding RegisterCommand}"/>
+    </StackPanel>
+</UserControl>

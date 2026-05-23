@@ -1,0 +1,163 @@
+﻿<UserControl x:Class="FMVideoManagerApp.Components.SettingsComponent.SettingsComponent"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FMVideoManagerApp.Components.SettingsComponent"
+             xmlns:viewModels="clr-namespace:FMVideoManagerApp.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=viewModels:SettingsViewModel}"
+             d:DesignHeight="630" d:DesignWidth="1000">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="SettingsComponentStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30px"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="75px"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!--search bar-->
+        <StackPanel
+            Grid.Row="0" Grid.Column="1"
+            Orientation="Horizontal"
+            HorizontalAlignment="Center">
+            <TextBox
+                Width="200px"
+                Margin="15px 0px"
+                Text="Search by alias" />
+            <TextBox
+                Width="175px"
+                Margin="15px 0px"
+                Text="Search by tag" />
+        </StackPanel>
+        
+        <!--settings-->
+        <ScrollViewer
+            Grid.Row="1" Grid.Column="1"
+            VerticalScrollBarVisibility="Hidden"
+            HorizontalScrollBarVisibility="Hidden"
+            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+            VerticalAlignment="Stretch" VerticalContentAlignment="Top"
+            Padding="0px"
+            Margin="0px"
+            Background="{StaticResource BaseColor1}">
+            <StackPanel
+                VerticalAlignment="Top"
+                HorizontalAlignment="Stretch"
+                Margin="50px 25px 50px 0px">
+                <!--paths-->
+                <StackPanel
+                    Orientation="Horizontal">
+                    <Label
+                        FontSize="24"
+                        Padding="0"
+                        Content="Paths:"/>
+                    <!--add path-->
+                    <Button
+                        Width="35px"
+                        VerticalAlignment="Stretch" VerticalContentAlignment="Center"
+                        HorizontalAlignment="Left" HorizontalContentAlignment="Center"
+                        FontSize="16"
+                        Padding="0px"
+                        Margin="5px 0px 0px 0px"
+                        Command="{Binding AddPathCommand}">
+                        <Image
+                            Height="25px"
+                            Source="/Resources/Icons/plus.png"/>
+                    </Button>
+                </StackPanel>
+                <!--path list-->
+                <StackPanel
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Left">
+                    <ListBox
+                        x:Name="pathsListBox"
+                        Padding="0px"
+                        Margin="0px"
+                        Background="Transparent"
+                        d:ItemsSource="{d:SampleData ItemCount=4}"
+                        ItemsSource="{Binding Paths}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <!--path-->
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    VerticalAlignment="Top"
+                                    HorizontalAlignment="Stretch"
+                                    Margin="15px 5px 0px 0px">
+                                    <!--path text-->
+                                    <TextBox
+                                        MaxWidth="725px"
+                                        FontSize="16"
+                                        Padding="5px 5px"
+                                        d:Text="C:\Users\lar\Videos\Res\Replay 20C:\Users\la 2026-05s\Replay 20C:\Users\la-13 22lit\Videos\Replay 20C:\Users\lat\Videos\"
+                                        Text="{Binding Path=Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <!--remove path-->
+                                    <Button
+                                        Width="35px"
+                                        VerticalAlignment="Stretch" VerticalContentAlignment="Center"
+                                        HorizontalAlignment="Left" HorizontalContentAlignment="Center"
+                                        FontSize="16"
+                                        Padding="0px"
+                                        Margin="15px 0px 0px 0px"
+                                        Command="{Binding DataContext.RemovePathCommand, ElementName=pathsListBox}" CommandParameter="{Binding}">
+                                        <Image
+                                            Height="25px"
+                                            Source="/Resources/Icons/minus.png"/>
+                                    </Button>
+                                    <!--copy path-->
+                                    <Button
+                                        Width="35px"
+                                        VerticalAlignment="Stretch" VerticalContentAlignment="Center"
+                                        HorizontalAlignment="Left" HorizontalContentAlignment="Center"
+                                        FontSize="16"
+                                        Padding="0px"
+                                        Margin="5px 0px 0px 0px"
+                                        Command="{Binding DataContext.CopyPathCommand, ElementName=pathsListBox}" CommandParameter="{Binding}">
+                                        <Image
+                                            Height="25px"
+                                            Source="/Resources/Icons/copy.png"/>
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+                
+                <!--columns-->
+                <DockPanel
+                    Margin="0px 20px 0px 0px">
+                    <Label
+                        DockPanel.Dock="Left"
+                        FontSize="24"
+                        Padding="0"
+                        Content="Columns:"/>
+                    <Label
+                        DockPanel.Dock="Left"
+                        FontSize="24"
+                        Padding="0"
+                        Margin="15px 0px 0px 0px"
+                        Content="{Binding ColumnsCount, FallbackValue=1}"/>
+                    <!--[1 - 6]-->
+                    <Slider
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
+                        Margin="15px 0px 0px 0px"
+                        TickPlacement="BottomRight"
+                        IsSnapToTickEnabled="True"
+                        Minimum="1" Maximum="6"
+                        Value="{Binding ColumnsCount}"/>
+                </DockPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

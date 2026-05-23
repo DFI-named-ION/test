@@ -1,0 +1,14 @@
+C:\Users\larit\source\repos\F-F\FMVideoManager\FMVideoManager\bin\Debug\net9.0\FMVideoManager.exe
+C:\Users\larit\source\repos\F-F\FMVideoManager\FMVideoManager\bin\Debug\net9.0\FMVideoManager.deps.json
+C:\Users\larit\source\repos\F-F\FMVideoManager\FMVideoManager\bin\Debug\net9.0\FMVideoManager.runtimeconfig.json
+C:\Users\larit\source\repos\F-F\FMVideoManager\FMVideoManager\bin\Debug\net9.0\FMVideoManager.dll
+C:\Users\larit\source\repos\F-F\FMVideoManager\FMVideoManager\bin\Debug\net9.0\FMVideoManager.pdb
+C:\Users\larit\source\repos\F-F\FMVideoManager\FMVideoManager\obj\Debug\net9.0\FMVideoManager.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\larit\source\repos\F-F\FMVideoManager\FMVideoManager\obj\Debug\net9.0\FMVideoManager.AssemblyInfoInputs.cache
+C:\Users\larit\source\repos\F-F\FMVideoManager\FMVideoManager\obj\Debug\net9.0\FMVideoManager.AssemblyInfo.cs
+C:\Users\larit\source\repos\F-F\FMVideoManager\FMVideoManager\obj\Debug\net9.0\FMVideoManager.csproj.CoreCompileInputs.cache
+C:\Users\larit\source\repos\F-F\FMVideoManager\FMVideoManager\obj\Debug\net9.0\FMVideoManager.dll
+C:\Users\larit\source\repos\F-F\FMVideoManager\FMVideoManager\obj\Debug\net9.0\refint\FMVideoManager.dll
+C:\Users\larit\source\repos\F-F\FMVideoManager\FMVideoManager\obj\Debug\net9.0\FMVideoManager.pdb
+C:\Users\larit\source\repos\F-F\FMVideoManager\FMVideoManager\obj\Debug\net9.0\FMVideoManager.genruntimeconfig.cache
+C:\Users\larit\source\repos\F-F\FMVideoManager\FMVideoManager\obj\Debug\net9.0\ref\FMVideoManager.dll

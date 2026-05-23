@@ -1,0 +1,301 @@
+﻿<UserControl x:Class="FMVideoManagerApp.Components.FileListComponent.FileListComponent"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FMVideoManagerApp.Components.FileListComponent"
+             xmlns:viewModels="clr-namespace:FMVideoManagerApp.ViewModels"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance Type=viewModels:FileListViewModel}"
+             d:DesignHeight="630" d:DesignWidth="1000">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="FileListComponentStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30px"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="75px"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="350px"/>
+        </Grid.ColumnDefinitions>
+        <!--search bar-->
+        <StackPanel
+            Grid.Row="0" Grid.Column="1"
+            Orientation="Horizontal"
+            HorizontalAlignment="Center">
+            <Button
+                Content="Index"
+                Command="{Binding StartIndexingCommand}"/>
+            <TextBox
+                Width="200px"
+                Margin="15px 0px"
+                Text="Search by alias" />
+            <TextBox
+                Width="175px"
+                Margin="15px 0px"
+                Text="Search by tag" />
+        </StackPanel>
+        
+        <!--files layout-->
+        <Grid
+            Grid.Row="1" Grid.Column="1">
+            <!--files-->
+            <ScrollViewer
+                VerticalScrollBarVisibility="Auto"
+                HorizontalScrollBarVisibility="Disabled">
+                <ItemsControl
+                    Width="575"
+                    VerticalAlignment="Top"
+                    Background="{StaticResource BaseColor1}"
+                    ItemsSource="{Binding HierarchyEntries}"
+                    d:ItemsSource="{d:SampleData ItemCount=11}">
+
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel
+                                VerticalAlignment="Top"
+                                Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="VerticalAlignment" Value="Top" />
+                            <Setter Property="HorizontalAlignment" Value="Left" />
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button
+                                Command="{Binding DataContext.SelectEntryCommand,
+                                                  RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                CommandParameter="{Binding}"
+                                Padding="0"
+                                Margin="10 0 10 10"
+                                BorderThickness="0"
+                                HorizontalContentAlignment="Stretch"
+                                VerticalContentAlignment="Stretch"
+                                Cursor="Hand">
+
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <ContentPresenter />
+                                    </ControlTemplate>
+                                </Button.Template>
+
+                                <Border
+                                    Width="{Binding DataContext.CardWidth,
+                                                    RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                    Height="{Binding DataContext.CardHeight,
+                                                     RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                    BorderBrush="{StaticResource BaseColor3}"
+                                    BorderThickness="0">
+
+                                    <StackPanel>
+                                        <Image
+                                            Width="{Binding DataContext.ImageWidth,
+                                                            RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            Height="{Binding DataContext.ImageHeight,
+                                                             RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            Stretch="Uniform"
+                                            HorizontalAlignment="Center"
+                                            Source="/Resources/Images/image_placeholder2.png" />
+
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            Margin="4 5 4 0"
+                                            FontSize="{Binding DataContext.CardFontSize,
+                                                               RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            Text="{Binding OriginalFilename}"
+                                            TextWrapping="Wrap"
+                                            TextAlignment="Center"
+                                            TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                </Border>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+        
+        <!--side panel with file info-->
+        <ScrollViewer
+            x:Name="SidePanel"
+            Grid.Row="0" Grid.Column="1"
+            Grid.RowSpan="2" Grid.ColumnSpan="2"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Stretch"
+            Width="350px"
+            Background="{StaticResource BaseColor2}"
+            Panel.ZIndex="100"
+            VerticalScrollBarVisibility="Hidden"
+            MouseEnter="SidePanel_MouseEnter"
+            MouseLeave="SidePanel_MouseLeave">
+            <StackPanel>
+                <!--filename-->
+                <Label
+                    VerticalAlignment="Top" VerticalContentAlignment="Center"
+                    HorizontalAlignment="Center" HorizontalContentAlignment="Left"
+                    FontSize="24"
+                    Padding="0px"
+                    Margin="15px 5px 15px 0px"
+                    Content="{Binding SelectedEntry.OriginalFilename}" />
+                <!--preview-->
+                <Image
+                    x:Name="Preview"
+                    Width="300px" Height="225px"
+                    HorizontalAlignment="Center"
+                    Margin="15px 15px 15px 0px"
+                    Stretch="Uniform"
+                    Source="/Resources/Images/image_placeholder.png"/>
+                <!--play button-->
+                <Button
+                    Width="300px" Height="30px"
+                    VerticalAlignment="Center" VerticalContentAlignment="Center"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                    Margin="15px 5px 15px 0px">
+                    <Label
+                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                        FontSize="16"
+                        Padding="0px"
+                        Content="open in player"/>
+                </Button>
+                <!--tags stackpanel?-->
+                <Label
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                    FontSize="14"
+                    Padding="0px"
+                    Margin="15px 15px 0px 0px"
+                    Content="Tags:"/>
+                <WrapPanel
+                    Orientation="Horizontal"
+                    MinWidth="300px"
+                    HorizontalAlignment="Stretch"
+                    Margin="15px 0px">
+                    <Border
+                        Width="50px" Height="25px"
+                        Margin="0px 5px 15px 0px"
+                        Background="{StaticResource BaseColor4}"/>
+                    <Border
+                        Width="100px" Height="25px"
+                        Margin="0px 5px 15px 0px"
+                        Background="{StaticResource BaseColor1}"/>
+                    <Border
+                        Width="75px" Height="25px"
+                        Margin="0px 5px 15px 0px"
+                        Background="{StaticResource BaseColor3}"/>
+                    <Border
+                        Width="75px" Height="25px"
+                        Margin="0px 5px 15px 0px"
+                        Background="{StaticResource DarkerWhiteSmoke}"/>
+                    <Border
+                        Width="50px" Height="25px"
+                        Margin="0px 5px 15px 0px"
+                        Background="{StaticResource BaseColor5}"/>
+                    <Border
+                        Width="100px" Height="25px"
+                        Margin="0px 5px 15px 0px"
+                        Background="{StaticResource WhiteSmoke}"/>
+                </WrapPanel>
+                <!--resolution-->
+                <StackPanel
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Stretch"
+                    Margin="15px 5px 15px 0px">
+                    <Label
+                        HorizontalAlignment="Left"
+                        FontSize="14"
+                        Padding="0px"
+                        Margin="0px 0px 10px 0px "
+                        Content="Resolution: "/>
+                    <Label
+                        HorizontalAlignment="Left"
+                        FontSize="14"
+                        Padding="0px"
+                        Margin="0px"
+                        Content="{Binding SelectedEntry.Resolution}"/>
+                </StackPanel>
+                <!--size-->
+                <StackPanel
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Stretch"
+                    Margin="15px 5px 15px 0px">
+                    <Label
+                        HorizontalAlignment="Left"
+                        FontSize="14"
+                        Padding="0px"
+                        Margin="0px 0px 10px 0px "
+                        Content="Size:"/>
+                    <Label
+                        HorizontalAlignment="Left"
+                        FontSize="14"
+                        Padding="0px"
+                        Margin="0px"
+                        Content="{Binding SelectedEntry.Size}"/>
+                </StackPanel>
+                <!--path-->
+                <StackPanel
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Stretch"
+                    Margin="15px 5px 15px 0px">
+                    <Label
+                        HorizontalAlignment="Left"
+                        FontSize="14"
+                        Padding="0px"
+                        Margin="0px 0px 10px 0px "
+                        Content="Path:"/>
+                    <Label
+                        HorizontalAlignment="Left"
+                        FontSize="14"
+                        Padding="0px"
+                        Margin="0px"
+                        Content="{Binding SelectedEntry.Path}"/>
+                </StackPanel>
+                <!--lenght-->
+                <StackPanel
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Stretch"
+                    Margin="15px 5px 15px 0px">
+                    <Label
+                        HorizontalAlignment="Left"
+                        FontSize="14"
+                        Padding="0px"
+                        Margin="0px 0px 10px 0px "
+                        Content="Lenght:"/>
+                    <Label
+                        HorizontalAlignment="Left"
+                        FontSize="14"
+                        Padding="0px"
+                        Margin="0px"
+                        Content="{Binding SelectedEntry.Lenght}"/>
+                </StackPanel>
+                <!--Notes-->
+                <StackPanel
+                    HorizontalAlignment="Stretch"
+                    Margin="15px 15px 15px 15px">
+                    <Label
+                        HorizontalContentAlignment="Left"
+                        FontSize="14"
+                        Padding="0px"
+                        Content="Notes:"/>
+                    <TextBox
+                        MinHeight="150px"
+                        FontSize="12"
+                        Padding="10px"
+                        Margin="0px 5px 0px 0px"
+                        TextWrapping="Wrap"
+                        Text="{Binding SelectedEntry.Notes}"/>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

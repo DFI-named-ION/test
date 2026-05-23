@@ -1,0 +1,28 @@
+﻿<Application x:Class="FMVideoManagerApp.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:FMVideoManagerApp"
+             xmlns:viewModels="clr-namespace:FMVideoManagerApp.ViewModels"
+             xmlns:logInComponent="clr-namespace:FMVideoManagerApp.Components.LogInComponent"
+             xmlns:fileListComponent="clr-namespace:FMVideoManagerApp.Components.FileListComponent"
+             xmlns:settingsComponent="clr-namespace:FMVideoManagerApp.Components.SettingsComponent">
+    <Application.Resources>
+        <SolidColorBrush x:Key="WhiteSmoke" Color="#D9D9D9" />
+        <SolidColorBrush x:Key="DarkerWhiteSmoke" Color="#C9C9C9" />
+        <SolidColorBrush x:Key="BaseColor1" Color="#8ecae6" />
+        <SolidColorBrush x:Key="BaseColor2" Color="#219ebc" />
+        <SolidColorBrush x:Key="BaseColor3" Color="#023047" />
+        <SolidColorBrush x:Key="BaseColor4" Color="#ffb703" />
+        <SolidColorBrush x:Key="BaseColor5" Color="#fb8500" />
+
+        <DataTemplate DataType="{x:Type viewModels:LogInViewModel}">
+            <logInComponent:LogInComponent />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:FileListViewModel}">
+            <fileListComponent:FileListComponent />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:SettingsViewModel}">
+            <settingsComponent:SettingsComponent/>
+        </DataTemplate>
+    </Application.Resources>
+</Application>
