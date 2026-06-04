@@ -10,11 +10,6 @@ namespace FMVideoManagerApp.Components.FileListComponent
         private const double MinWidth = 350;
         private const double MaxWidth = 500;
 
-        private const double PreviewMinWidth = 300;
-        private const double PreviewMinHeight = 225;
-        private const double PreviewMaxWidth = 440;
-        private const double PreviewMaxHeight = 330;
-
         public FileListComponent()
         {
             InitializeComponent();
@@ -22,15 +17,15 @@ namespace FMVideoManagerApp.Components.FileListComponent
 
         private void SidePanel_MouseEnter(object sender, MouseEventArgs e)
         {
-            PlayAnimation(MaxWidth, PreviewMaxWidth, PreviewMaxHeight);
+            PlayAnimation(MaxWidth);
         }
 
         private void SidePanel_MouseLeave(object sender, MouseEventArgs e)
         {
-            PlayAnimation(MinWidth, PreviewMinWidth, PreviewMinHeight);
+            PlayAnimation(MinWidth);
         }
 
-        private void PlayAnimation(double targetPanelWidth, double targetPreviewWidth, double targetPreviewHeight)
+        private void PlayAnimation(double targetPanelWidth)
         {
             var duration = TimeSpan.FromMilliseconds(300);
 
@@ -56,29 +51,7 @@ namespace FMVideoManagerApp.Components.FileListComponent
                 }
             };
 
-            var previewWidthAnimation = new DoubleAnimation
-            {
-                To = targetPreviewWidth,
-                Duration = duration,
-                EasingFunction = new SineEase
-                {
-                    EasingMode = EasingMode.EaseOut
-                }
-            };
-
-            var previewHeightAnimation = new DoubleAnimation
-            {
-                To = targetPreviewHeight,
-                Duration = duration,
-                EasingFunction = new SineEase
-                {
-                    EasingMode = EasingMode.EaseOut
-                }
-            };
-
             SidePanel.BeginAnimation(FrameworkElement.WidthProperty, panelAnimation);
-            Preview.BeginAnimation(FrameworkElement.WidthProperty, previewWidthAnimation);
-            Preview.BeginAnimation(FrameworkElement.HeightProperty, previewHeightAnimation);
         }
     }
 }

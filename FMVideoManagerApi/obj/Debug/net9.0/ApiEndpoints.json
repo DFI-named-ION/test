@@ -1,15 +1,21 @@
 [
   {
-    "ContainingType": "FMVideoManagerApi.Controllers.WeatherForecastController",
-    "Method": "Get",
-    "RelativePath": "WeatherForecast",
-    "HttpMethod": "GET",
+    "ContainingType": "FMVideoManagerApi.Controllers.AuthController",
+    "Method": "Login",
+    "RelativePath": "api/auth/login",
+    "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "FMVideoManagerApi.Data.DTO.LoginRequest",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[FMVideoManagerApi.WeatherForecast, FMVideoManagerApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "FMVideoManagerApi.Data.DTO.AuthResponse",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -17,7 +23,514 @@
         ],
         "StatusCode": 200
       }
+    ]
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.AuthController",
+    "Method": "Me",
+    "RelativePath": "api/auth/me",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "FMVideoManagerApi.Data.DTO.AuthResponse",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.AuthController",
+    "Method": "Register",
+    "RelativePath": "api/auth/register",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "FMVideoManagerApi.Data.DTO.RegisterRequest",
+        "IsRequired": true
+      }
     ],
-    "EndpointName": "GetWeatherForecast"
+    "ReturnTypes": [
+      {
+        "Type": "FMVideoManagerApi.Data.DTO.AuthResponse",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.CloudAccountsController",
+    "Method": "GetAccounts",
+    "RelativePath": "api/cloud/accounts",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[FMVideoManagerApi.Data.DTO.CloudProviderAccountDto, FMVideoManagerApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.CloudAccountsController",
+    "Method": "RemoveAccount",
+    "RelativePath": "api/cloud/accounts/{accountId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "accountId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.CloudAccountsController",
+    "Method": "ActivateAccount",
+    "RelativePath": "api/cloud/accounts/{accountId}/activate",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "accountId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.CloudAccountsController",
+    "Method": "DeactivateAccount",
+    "RelativePath": "api/cloud/accounts/{accountId}/deactivate",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "accountId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.DropboxCloudController",
+    "Method": "IndexDropboxAccount",
+    "RelativePath": "api/cloud/dropbox/accounts/{accountId}/index",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "accountId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.DropboxCloudController",
+    "Method": "Callback",
+    "RelativePath": "api/cloud/dropbox/callback",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "code",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "state",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "error",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.DropboxCloudController",
+    "Method": "StartConnect",
+    "RelativePath": "api/cloud/dropbox/connect/start",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "FMVideoManagerApi.Data.DTO.Dropbox.StartDropboxConnectResponse",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.FilesController",
+    "Method": "GetFiles",
+    "RelativePath": "api/files",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[FMVideoManagerApi.Data.DTO.ServerFileDto, FMVideoManagerApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.FilesController",
+    "Method": "GetFileReferences",
+    "RelativePath": "api/files/{fileNodeId}/references",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "fileNodeId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[FMVideoManagerApi.Data.DTO.StorageReferenceDto, FMVideoManagerApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.FilesController",
+    "Method": "RegisterLocalFile",
+    "RelativePath": "api/files/register-local",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "FMVideoManagerApi.Data.DTO.RegisterLocalFileRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "FMVideoManagerApi.Data.DTO.RegisterLocalFileResponse",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.HierarchyController",
+    "Method": "GetHierarchy",
+    "RelativePath": "api/hierarchy",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[FMVideoManagerApi.Data.DTO.Hierarchy.HierarchyNodeDto, FMVideoManagerApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.HierarchyController",
+    "Method": "DeleteNode",
+    "RelativePath": "api/hierarchy/{nodeId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "nodeId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.HierarchyController",
+    "Method": "UpdateNodeDescription",
+    "RelativePath": "api/hierarchy/{nodeId}/description",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "nodeId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "FMVideoManagerApi.Data.DTO.Hierarchy.UpdateNodeDescriptionRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.HierarchyController",
+    "Method": "MoveNode",
+    "RelativePath": "api/hierarchy/{nodeId}/move",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "nodeId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "FMVideoManagerApi.Data.DTO.Hierarchy.MoveNodeRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.HierarchyController",
+    "Method": "UpdateNodeNotes",
+    "RelativePath": "api/hierarchy/{nodeId}/notes",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "nodeId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "FMVideoManagerApi.Data.DTO.Hierarchy.UpdateNodeNotesRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.HierarchyController",
+    "Method": "RenameNode",
+    "RelativePath": "api/hierarchy/{nodeId}/rename",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "nodeId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "FMVideoManagerApi.Data.DTO.Hierarchy.RenameNodeRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.HierarchyController",
+    "Method": "CreateGroup",
+    "RelativePath": "api/hierarchy/groups",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "FMVideoManagerApi.Data.DTO.Hierarchy.CreateGroupRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "FMVideoManagerApi.Data.DTO.Hierarchy.HierarchyNodeDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.TagsController",
+    "Method": "GetTags",
+    "RelativePath": "api/tags",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[FMVideoManagerApi.Data.DTO.Tags.TagDto, FMVideoManagerApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.TagsController",
+    "Method": "CreateTag",
+    "RelativePath": "api/tags",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "FMVideoManagerApi.Data.DTO.Tags.CreateTagRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "FMVideoManagerApi.Data.DTO.Tags.TagDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.TagsController",
+    "Method": "GetNodeTags",
+    "RelativePath": "api/tags/nodes/{nodeId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "nodeId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[FMVideoManagerApi.Data.DTO.Tags.TagDto, FMVideoManagerApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.TagsController",
+    "Method": "ApplyTagToNode",
+    "RelativePath": "api/tags/nodes/{nodeId}/{tagId}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "nodeId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      },
+      {
+        "Name": "tagId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.TagsController",
+    "Method": "RemoveTagFromNode",
+    "RelativePath": "api/tags/nodes/{nodeId}/{tagId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "nodeId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      },
+      {
+        "Name": "tagId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   }
 ]

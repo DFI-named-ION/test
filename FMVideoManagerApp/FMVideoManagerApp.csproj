@@ -10,12 +10,22 @@
 
   <ItemGroup>
     <None Remove="Resources\Exec\ffprobe.exe" />
+    <None Remove="Resources\Icons\arrow_left.png" />
+    <None Remove="Resources\Icons\arrow_right.png" />
+    <None Remove="Resources\Icons\arrow_up.png" />
     <None Remove="Resources\Icons\copy.png" />
+    <None Remove="Resources\Icons\exit.png" />
     <None Remove="Resources\Icons\files.png" />
+    <None Remove="Resources\Icons\folder.png" />
+    <None Remove="Resources\Icons\hierarchy-files.png" />
     <None Remove="Resources\Icons\minus.png" />
     <None Remove="Resources\Icons\plus.png" />
+    <None Remove="Resources\Icons\refresh.png" />
     <None Remove="Resources\Icons\settings.png" />
+    <None Remove="Resources\Icons\toggle-off.png" />
+    <None Remove="Resources\Icons\toggle-on.png" />
     <None Remove="Resources\Icons\x.png" />
+    <None Remove="Resources\Icons\x_inverted.png" />
     <None Remove="Resources\Images\image_placeholder.png" />
     <None Remove="Resources\Images\image_placeholder2.png" />
   </ItemGroup>
@@ -27,12 +37,22 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\Icons\arrow_left.png" />
+    <Resource Include="Resources\Icons\arrow_right.png" />
+    <Resource Include="Resources\Icons\arrow_up.png" />
     <Resource Include="Resources\Icons\copy.png" />
+    <Resource Include="Resources\Icons\exit.png" />
     <Resource Include="Resources\Icons\files.png" />
+    <Resource Include="Resources\Icons\folder.png" />
+    <Resource Include="Resources\Icons\hierarchy-files.png" />
     <Resource Include="Resources\Icons\minus.png" />
     <Resource Include="Resources\Icons\plus.png" />
+    <Resource Include="Resources\Icons\refresh.png" />
     <Resource Include="Resources\Icons\settings.png" />
+    <Resource Include="Resources\Icons\toggle-off.png" />
+    <Resource Include="Resources\Icons\toggle-on.png" />
     <Resource Include="Resources\Icons\x.png" />
+    <Resource Include="Resources\Icons\x_inverted.png" />
     <Resource Include="Resources\Images\image_placeholder.png" />
     <Resource Include="Resources\Images\image_placeholder2.png" />
   </ItemGroup>
@@ -50,6 +70,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.15" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.15" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.15" />
   </ItemGroup>
 
 </Project>

@@ -25,109 +25,486 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="350px"/>
         </Grid.ColumnDefinitions>
-        <!--search bar-->
-        <StackPanel
-            Grid.Row="0" Grid.Column="1"
-            Orientation="Horizontal"
-            HorizontalAlignment="Center">
-            <Button
-                Content="Index"
-                Command="{Binding StartIndexingCommand}"/>
-            <TextBox
-                Width="200px"
-                Margin="15px 0px"
-                Text="Search by alias" />
-            <TextBox
-                Width="175px"
-                Margin="15px 0px"
-                Text="Search by tag" />
-        </StackPanel>
-        
-        <!--files layout-->
+        <!-- progress bar -->
+        <Grid
+            Grid.Row="0" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="450px"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <!--progress-->
+            <StackPanel
+                Grid.Column="0"
+                VerticalAlignment="Center">
+                <ProgressBar
+                    Minimum="0"
+                    Maximum="100"
+                    Height="30"
+                    VerticalAlignment="Center"
+                    Value="{Binding Indexing.ProgressPercent, Mode=OneWay}"
+                    IsIndeterminate="{Binding Indexing.IsIndeterminate, Mode=OneWay}" />
+            </StackPanel>
+            <!--files count-->
+            <Grid
+                Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="3*" />
+                </Grid.ColumnDefinitions>
+                <Label
+                    Grid.Column="0"
+                    VerticalAlignment="Stretch" VerticalContentAlignment="Center"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Right"
+                    d:Background="White"
+                    Content="{Binding Indexing.ProcessedFiles}"/>
+                <Label
+                    Grid.Column="1"
+                    VerticalAlignment="Stretch" VerticalContentAlignment="Center"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                    d:Background="White"
+                    Content="/"/>
+                <Label
+                    Grid.Column="2"
+                    VerticalAlignment="Stretch" VerticalContentAlignment="Center"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                    d:Background="White"
+                    Content="{Binding Indexing.TotalFiles}"/>
+            </Grid>
+        </Grid>
+
+        <!-- main layout -->
         <Grid
             Grid.Row="1" Grid.Column="1">
-            <!--files-->
+            <!-- groups + files -->
             <ScrollViewer
                 VerticalScrollBarVisibility="Auto"
-                HorizontalScrollBarVisibility="Disabled">
-                <ItemsControl
-                    Width="575"
-                    VerticalAlignment="Top"
-                    Background="{StaticResource BaseColor1}"
-                    ItemsSource="{Binding HierarchyEntries}"
-                    d:ItemsSource="{d:SampleData ItemCount=11}">
+                HorizontalScrollBarVisibility="Disabled"
+                Background="{StaticResource BaseColor1}">
+                <StackPanel>
+                    <TabControl
+                        Padding="0px 10px 0px 0px"
+                        Background="Transparent"
+                        BorderThickness="0px">
+                        <TabItem Header="Everything">
+                            <StackPanel>
+                                <!-- all groups -->
+                                <Expander
+                                    Width="575px"
+                                    Header="{Binding Hierarchy.AllGroupsHeader}"
+                                    IsExpanded="False">
 
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel
-                                VerticalAlignment="Top"
-                                Orientation="Horizontal" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl
+                                        Width="575px"
+                                        VerticalAlignment="Top"
+                                        ItemsSource="{Binding Hierarchy.AllGroups}"
+                                        d:ItemsSource="{d:SampleData ItemCount=11}">
 
-                    <ItemsControl.ItemContainerStyle>
-                        <Style TargetType="ContentPresenter">
-                            <Setter Property="VerticalAlignment" Value="Top" />
-                            <Setter Property="HorizontalAlignment" Value="Left" />
-                        </Style>
-                    </ItemsControl.ItemContainerStyle>
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel
+                                                    VerticalAlignment="Top"
+                                                    Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
 
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Button
-                                Command="{Binding DataContext.SelectEntryCommand,
-                                                  RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                CommandParameter="{Binding}"
-                                Padding="0"
-                                Margin="10 0 10 10"
-                                BorderThickness="0"
-                                HorizontalContentAlignment="Stretch"
-                                VerticalContentAlignment="Stretch"
-                                Cursor="Hand">
+                                        <ItemsControl.ItemContainerStyle>
+                                            <Style TargetType="ContentPresenter">
+                                                <Setter Property="VerticalAlignment" Value="Top" />
+                                                <Setter Property="HorizontalAlignment" Value="Left" />
+                                            </Style>
+                                        </ItemsControl.ItemContainerStyle>
 
-                                <Button.Template>
-                                    <ControlTemplate TargetType="Button">
-                                        <ContentPresenter />
-                                    </ControlTemplate>
-                                </Button.Template>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Button
+                                                    Command="{Binding DataContext.SelectEntryCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Padding="0px"
+                                                    Margin="10px 15px 10px 10px"
+                                                    BorderThickness="0"
+                                                    HorizontalContentAlignment="Stretch"
+                                                    VerticalContentAlignment="Stretch"
+                                                    Cursor="Hand">
 
-                                <Border
-                                    Width="{Binding DataContext.CardWidth,
-                                                    RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                    Height="{Binding DataContext.CardHeight,
-                                                     RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                    BorderBrush="{StaticResource BaseColor3}"
-                                    BorderThickness="0">
+                                                    <Button.Template>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <ContentPresenter />
+                                                        </ControlTemplate>
+                                                    </Button.Template>
 
-                                    <StackPanel>
-                                        <Image
-                                            Width="{Binding DataContext.ImageWidth,
-                                                            RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                            Height="{Binding DataContext.ImageHeight,
-                                                             RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                            Stretch="Uniform"
-                                            HorizontalAlignment="Center"
-                                            Source="/Resources/Images/image_placeholder2.png" />
+                                                    <Border
+                                                        Width="{Binding DataContext.CardWidth, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        Height="{Binding DataContext.CardHeight, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        BorderBrush="{StaticResource BaseColor3}"
+                                                        BorderThickness="0">
 
-                                        <TextBlock
-                                            HorizontalAlignment="Center"
-                                            Margin="4 5 4 0"
-                                            FontSize="{Binding DataContext.CardFontSize,
-                                                               RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                            Text="{Binding OriginalFilename}"
-                                            TextWrapping="Wrap"
-                                            TextAlignment="Center"
-                                            TextTrimming="CharacterEllipsis" />
+                                                        <StackPanel>
+                                                            <Image
+                                                                Width="{Binding DataContext.ImageWidth, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                Height="{Binding DataContext.ImageHeight, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                Stretch="Uniform"
+                                                                HorizontalAlignment="Center"
+                                                                Source="/Resources/Icons/folder.png" />
+
+                                                            <TextBlock
+                                                                HorizontalAlignment="Center"
+                                                                Margin="5px 5px 5px 0px"
+                                                                FontSize="{Binding DataContext.CardFontSize, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                Text="{Binding Title}"
+                                                                TextWrapping="Wrap"
+                                                                TextAlignment="Center"
+                                                                TextTrimming="CharacterEllipsis" />
+
+                                                            <TextBlock
+                                                                HorizontalAlignment="Center"
+                                                                FontSize="11"
+                                                                Opacity="0.65"
+                                                                Text="Group" />
+                                                        </StackPanel>
+                                                    </Border>
+                                                </Button>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Expander>
+
+                                <!-- all files -->
+                                <Expander
+                                    Width="575px"
+                                    Margin="0px 15px 0px 0px"
+                                    Header="{Binding Hierarchy.AllFilesHeader}"
+                                    IsExpanded="False">
+
+                                    <ItemsControl
+                                        Width="575px"
+                                        VerticalAlignment="Top"
+                                        ItemsSource="{Binding Hierarchy.AllFiles}"
+                                        d:ItemsSource="{d:SampleData ItemCount=11}">
+
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel
+                                                    VerticalAlignment="Top"
+                                                    Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+
+                                        <ItemsControl.ItemContainerStyle>
+                                            <Style TargetType="ContentPresenter">
+                                                <Setter Property="VerticalAlignment" Value="Top" />
+                                                <Setter Property="HorizontalAlignment" Value="Left" />
+                                            </Style>
+                                        </ItemsControl.ItemContainerStyle>
+
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Button
+                                                    Command="{Binding DataContext.SelectEntryCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Padding="0"
+                                                    Margin="10px 15px 10px 10px"
+                                                    BorderThickness="0"
+                                                    HorizontalContentAlignment="Stretch"
+                                                    VerticalContentAlignment="Stretch"
+                                                    Cursor="Hand">
+
+                                                    <Button.InputBindings>
+                                                        <MouseBinding
+                                                            MouseAction="LeftDoubleClick"
+                                                            Command="{Binding DataContext.OpenHierarchyItemCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                            CommandParameter="{Binding}" />
+                                                    </Button.InputBindings>
+
+                                                    <Button.Template>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <ContentPresenter />
+                                                        </ControlTemplate>
+                                                    </Button.Template>
+
+                                                    <Border
+                                                        Width="{Binding DataContext.CardWidth, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        Height="{Binding DataContext.CardHeight, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        BorderBrush="{StaticResource BaseColor3}"
+                                                        BorderThickness="0px">
+
+                                                        <StackPanel>
+                                                            <Image
+                                                                Width="{Binding DataContext.ImageWidth, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                Height="{Binding DataContext.ImageHeight, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                Stretch="Uniform"
+                                                                HorizontalAlignment="Center"
+                                                                Source="/Resources/Images/image_placeholder2.png" />
+
+                                                            <TextBlock
+                                                                HorizontalAlignment="Center"
+                                                                Margin="5px 5px 5px 0px"
+                                                                FontSize="{Binding DataContext.CardFontSize, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                Text="{Binding Title}"
+                                                                TextWrapping="Wrap"
+                                                                TextAlignment="Center"
+                                                                TextTrimming="CharacterEllipsis" />
+
+                                                            <TextBlock
+                                                                HorizontalAlignment="Center"
+                                                                FontSize="11"
+                                                                Opacity="0.65"
+                                                                Text="{Binding SizeText}" />
+
+                                                            <TextBlock
+                                                                HorizontalAlignment="Center"
+                                                                FontSize="11"
+                                                                Opacity="0.65"
+                                                                Text="{Binding Resolution}" />
+                                                        </StackPanel>
+                                                    </Border>
+                                                </Button>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Expander>
+                            </StackPanel>
+                        </TabItem>
+                        <TabItem Header="Hierarchy">
+                            <StackPanel>
+                                <!-- breadcrumbs -->
+                                <DockPanel
+                                    Margin="10px 5px 10px 0px"
+                                    LastChildFill="True">
+
+                                    <!-- left controls -->
+                                    <StackPanel
+                                        DockPanel.Dock="Left"
+                                        Orientation="Horizontal"
+                                        VerticalAlignment="Top">
+
+                                        <!-- up -->
+                                        <Button
+                                            Command="{Binding GoUpCommand}"
+                                            Padding="5px 1px"
+                                            Margin="0px 0px 5px 0px">
+                                            <Image
+                                                Width="18px"
+                                                Source="/Resources/Icons/arrow_up.png" />
+                                        </Button>
+
+                                        <!-- root -->
+                                        <Button
+                                            Content="Root"
+                                            Command="{Binding OpenRootCommand}"
+                                            Padding="10px 5px"
+                                            Margin="0px 0px 5px 0px" />
                                     </StackPanel>
-                                </Border>
-                            </Button>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+
+                                    <!-- breadcrumbs -->
+                                    <ItemsControl
+                                        ItemsSource="{Binding Hierarchy.Breadcrumbs}"
+                                        VerticalAlignment="Top">
+
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel
+                                                    Orientation="Horizontal"
+                                                    Margin="0px 0px 5px 5px">
+
+                                                    <TextBlock
+                                                        Text="/"
+                                                        VerticalAlignment="Center"
+                                                        Margin="5px 0px" />
+
+                                                    <Button
+                                                        Content="{Binding Title}"
+                                                        Command="{Binding DataContext.OpenBreadcrumbCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        Padding="10px 5px" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </DockPanel>
+
+                                <!-- hierarchy -->
+                                <ItemsControl
+                                    Width="575px"
+                                    VerticalAlignment="Top"
+                                    ItemsSource="{Binding Hierarchy.CurrentItems}">
+
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel
+                                                VerticalAlignment="Top"
+                                                Orientation="Horizontal" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+
+                                    <ItemsControl.ItemContainerStyle>
+                                        <Style TargetType="ContentPresenter">
+                                            <Setter Property="VerticalAlignment" Value="Top" />
+                                            <Setter Property="HorizontalAlignment" Value="Left" />
+                                        </Style>
+                                    </ItemsControl.ItemContainerStyle>
+
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button
+                                                Command="{Binding DataContext.SelectEntryCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"
+                                                Padding="0"
+                                                Margin="10px 15px 10px 10px"
+                                                BorderThickness="0"
+                                                HorizontalContentAlignment="Stretch"
+                                                VerticalContentAlignment="Stretch"
+                                                Cursor="Hand">
+
+                                                <Button.InputBindings>
+                                                    <MouseBinding
+                                                        MouseAction="LeftDoubleClick"
+                                                        Command="{Binding DataContext.OpenHierarchyItemCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        CommandParameter="{Binding}" />
+                                                </Button.InputBindings>
+
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <ContentPresenter />
+                                                    </ControlTemplate>
+                                                </Button.Template>
+
+                                                <Grid>
+                                                    <!-- group -->
+                                                    <Border
+                                                        Width="{Binding DataContext.CardWidth, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        Height="{Binding DataContext.CardHeight, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        BorderBrush="{StaticResource BaseColor3}"
+                                                        BorderThickness="0">
+
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsGroup}" Value="True">
+                                                                        <Setter Property="Visibility" Value="Visible" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+
+                                                        <StackPanel Margin="10px 0px 0px 0px">
+                                                            <Image
+                                                                Width="{Binding DataContext.ImageWidth, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                Height="{Binding DataContext.ImageHeight, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                Source="/Resources/Icons/folder.png" />
+
+                                                            <TextBlock
+                                                                HorizontalAlignment="Stretch"
+                                                                FontSize="{Binding DataContext.CardFontSize, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                TextTrimming="CharacterEllipsis"
+                                                                TextAlignment="Center"
+                                                                Text="{Binding Title}" />
+
+                                                            <TextBlock
+                                                                HorizontalAlignment="Stretch"
+                                                                FontSize="11"
+                                                                Opacity="0.65"
+                                                                TextAlignment="Center"
+                                                                Text="Group" />
+                                                        </StackPanel>
+                                                    </Border>
+
+                                                    <!-- file -->
+                                                    <Border
+                                                        Width="{Binding DataContext.CardWidth, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        Height="{Binding DataContext.CardHeight, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                        BorderBrush="{StaticResource BaseColor3}"
+                                                        BorderThickness="0">
+
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsFile}" Value="True">
+                                                                        <Setter Property="Visibility" Value="Visible" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+
+                                                        <StackPanel Margin="10px 0px 0px 0px">
+                                                            <Image
+                                                                Width="{Binding DataContext.ImageWidth, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                Height="{Binding DataContext.ImageHeight, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                Source="/Resources/Images/image_placeholder2.png" />
+
+                                                            <TextBlock
+                                                                HorizontalAlignment="Stretch"
+                                                                FontSize="{Binding DataContext.CardFontSize, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                                TextTrimming="CharacterEllipsis"
+                                                                TextAlignment="Center"
+                                                                Text="{Binding Title}" />
+
+                                                            <TextBlock
+                                                                HorizontalAlignment="Stretch"
+                                                                FontSize="11"
+                                                                Opacity="0.65"
+                                                                TextAlignment="Center"
+                                                                Text="{Binding SizeText}" />
+
+                                                            <TextBlock
+                                                                HorizontalAlignment="Stretch"
+                                                                FontSize="11"
+                                                                Opacity="0.65"
+                                                                TextAlignment="Center"
+                                                                Text="{Binding Resolution}" />
+
+                                                            <TextBlock
+                                                                HorizontalAlignment="Stretch"
+                                                                FontSize="11"
+                                                                Opacity="0.65"
+                                                                TextAlignment="Center"
+                                                                Text="{Binding Duration}" />
+                                                        </StackPanel>
+                                                    </Border>
+                                                </Grid>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </TabItem>
+                        <TabItem Header="Other">
+                            <StackPanel>
+                                <Expander
+                                    Width="575px"
+                                    Header="Debug"
+                                    IsExpanded="True">
+                                    <StackPanel>
+                                        <Button
+                                            Content="Start indexing local files"
+                                            Command="{Binding StartLocalIndexingCommand}"/>
+                                        <Button
+                                            Content="Cancel indexing local files"
+                                            Command="{Binding CancelLocalIndexingCommand}"/>
+                                        <Button
+                                            Content="Synchronise pending ?local? files?"
+                                            Command="{Binding SyncPendingLocalFilesCommand}"/>
+                                        <Button
+                                            Content="Start indexing cloud files"
+                                            Command="{Binding StartCloudIndexingCommand}"/>
+                                    </StackPanel>
+                                </Expander>
+                            </StackPanel>
+                        </TabItem>
+                    </TabControl>
+                </StackPanel>
             </ScrollViewer>
         </Grid>
-        
-        <!--side panel with file info-->
+
+        <!--side panel inspector-->
         <ScrollViewer
             x:Name="SidePanel"
             Grid.Row="0" Grid.Column="1"
@@ -137,165 +514,464 @@
             Width="350px"
             Background="{StaticResource BaseColor2}"
             Panel.ZIndex="100"
-            VerticalScrollBarVisibility="Hidden"
+            VerticalScrollBarVisibility="Auto"
             MouseEnter="SidePanel_MouseEnter"
             MouseLeave="SidePanel_MouseLeave">
-            <StackPanel>
-                <!--filename-->
-                <Label
-                    VerticalAlignment="Top" VerticalContentAlignment="Center"
-                    HorizontalAlignment="Center" HorizontalContentAlignment="Left"
-                    FontSize="24"
-                    Padding="0px"
-                    Margin="15px 5px 15px 0px"
-                    Content="{Binding SelectedEntry.OriginalFilename}" />
-                <!--preview-->
-                <Image
-                    x:Name="Preview"
-                    Width="300px" Height="225px"
-                    HorizontalAlignment="Center"
-                    Margin="15px 15px 15px 0px"
-                    Stretch="Uniform"
-                    Source="/Resources/Images/image_placeholder.png"/>
-                <!--play button-->
-                <Button
-                    Width="300px" Height="30px"
-                    VerticalAlignment="Center" VerticalContentAlignment="Center"
-                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
-                    Margin="15px 5px 15px 0px">
-                    <Label
-                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                        FontSize="16"
-                        Padding="0px"
-                        Content="open in player"/>
-                </Button>
-                <!--tags stackpanel?-->
-                <Label
-                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
-                    FontSize="14"
-                    Padding="0px"
-                    Margin="15px 15px 0px 0px"
-                    Content="Tags:"/>
-                <WrapPanel
-                    Orientation="Horizontal"
-                    MinWidth="300px"
-                    HorizontalAlignment="Stretch"
-                    Margin="15px 0px">
-                    <Border
-                        Width="50px" Height="25px"
-                        Margin="0px 5px 15px 0px"
-                        Background="{StaticResource BaseColor4}"/>
-                    <Border
-                        Width="100px" Height="25px"
-                        Margin="0px 5px 15px 0px"
-                        Background="{StaticResource BaseColor1}"/>
-                    <Border
-                        Width="75px" Height="25px"
-                        Margin="0px 5px 15px 0px"
-                        Background="{StaticResource BaseColor3}"/>
-                    <Border
-                        Width="75px" Height="25px"
-                        Margin="0px 5px 15px 0px"
-                        Background="{StaticResource DarkerWhiteSmoke}"/>
-                    <Border
-                        Width="50px" Height="25px"
-                        Margin="0px 5px 15px 0px"
-                        Background="{StaticResource BaseColor5}"/>
-                    <Border
-                        Width="100px" Height="25px"
-                        Margin="0px 5px 15px 0px"
-                        Background="{StaticResource WhiteSmoke}"/>
-                </WrapPanel>
-                <!--resolution-->
-                <StackPanel
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Stretch"
-                    Margin="15px 5px 15px 0px">
-                    <Label
-                        HorizontalAlignment="Left"
-                        FontSize="14"
-                        Padding="0px"
-                        Margin="0px 0px 10px 0px "
-                        Content="Resolution: "/>
-                    <Label
-                        HorizontalAlignment="Left"
-                        FontSize="14"
-                        Padding="0px"
-                        Margin="0px"
-                        Content="{Binding SelectedEntry.Resolution}"/>
-                </StackPanel>
-                <!--size-->
-                <StackPanel
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Stretch"
-                    Margin="15px 5px 15px 0px">
-                    <Label
-                        HorizontalAlignment="Left"
-                        FontSize="14"
-                        Padding="0px"
-                        Margin="0px 0px 10px 0px "
-                        Content="Size:"/>
-                    <Label
-                        HorizontalAlignment="Left"
-                        FontSize="14"
-                        Padding="0px"
-                        Margin="0px"
-                        Content="{Binding SelectedEntry.Size}"/>
-                </StackPanel>
-                <!--path-->
-                <StackPanel
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Stretch"
-                    Margin="15px 5px 15px 0px">
-                    <Label
-                        HorizontalAlignment="Left"
-                        FontSize="14"
-                        Padding="0px"
-                        Margin="0px 0px 10px 0px "
-                        Content="Path:"/>
-                    <Label
-                        HorizontalAlignment="Left"
-                        FontSize="14"
-                        Padding="0px"
-                        Margin="0px"
-                        Content="{Binding SelectedEntry.Path}"/>
-                </StackPanel>
-                <!--lenght-->
-                <StackPanel
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Stretch"
-                    Margin="15px 5px 15px 0px">
-                    <Label
-                        HorizontalAlignment="Left"
-                        FontSize="14"
-                        Padding="0px"
-                        Margin="0px 0px 10px 0px "
-                        Content="Lenght:"/>
-                    <Label
-                        HorizontalAlignment="Left"
-                        FontSize="14"
-                        Padding="0px"
-                        Margin="0px"
-                        Content="{Binding SelectedEntry.Lenght}"/>
-                </StackPanel>
-                <!--Notes-->
-                <StackPanel
-                    HorizontalAlignment="Stretch"
-                    Margin="15px 15px 15px 15px">
-                    <Label
-                        HorizontalContentAlignment="Left"
-                        FontSize="14"
-                        Padding="0px"
-                        Content="Notes:"/>
-                    <TextBox
-                        MinHeight="150px"
-                        FontSize="12"
-                        Padding="10px"
-                        Margin="0px 5px 0px 0px"
-                        TextWrapping="Wrap"
-                        Text="{Binding SelectedEntry.Notes}"/>
-                </StackPanel>
-            </StackPanel>
+
+            <ContentControl Content="{Binding SelectedEntry}">
+
+                <ContentControl.ContentTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+
+                            <!-- group -->
+                            <StackPanel>
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsGroup}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+
+                                <!-- title -->
+                                <TextBlock
+                                    FontSize="14"
+                                    Margin="15px 10px 15px 0px"
+                                    Text="Title" />
+
+                                <TextBlock
+                                    FontSize="22"
+                                    Margin="15px 10px 15px 0px"
+                                    Text="{Binding Title}" />
+
+                                <Image
+                                    Width="160px"
+                                    Height="160px"
+                                    HorizontalAlignment="Center"
+                                    Margin="15px 25px 15px 0px"
+                                    Source="/Resources/Icons/folder.png" />
+
+                                <TextBlock
+                                    FontSize="16"
+                                    Margin="15px 20px 15px 0px"
+                                    Text="Group info" />
+
+                                <!-- id -->
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    Margin="15px 10px 15px 0px">
+                                    <TextBlock
+                                        Width="75px"
+                                        Text="Node ID:" />
+                                    <TextBlock Text="{Binding Group.NodeId}" />
+                                </StackPanel>
+
+                                <!-- parent id -->
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    Margin="15px 5px 15px 0px">
+                                    <TextBlock
+                                        Width="75px"
+                                        Text="Parent:" />
+                                    <TextBlock Text="{Binding ParentNodeId}" />
+                                </StackPanel>
+
+                                <!-- foreground color -->
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    Margin="15px 5px 15px 0px">
+                                    <TextBlock
+                                        Width="75px"
+                                        Text="Text color:" />
+                                    <TextBlock Text="{Binding Group.ForegroundColorHex}" />
+                                    <Border
+                                        Width="10px"
+                                        Height="10px"
+                                        Background="{Binding Group.ForegroundColorHex}"/>
+                                </StackPanel>
+
+                                <!-- background color -->
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    Margin="15px 5px 15px 0px">
+                                    <TextBlock
+                                        Width="75px"
+                                        Text="Fill color:" />
+                                    <TextBlock Text="{Binding Group.BackgroundColorHex}" />
+                                    <Border
+                                        Width="10px"
+                                        Height="10px"
+                                        Background="{Binding Group.BackgroundColorHex}"/>
+                                </StackPanel>
+
+                                <!-- description -->
+                                <TextBlock
+                                    FontSize="14"
+                                    Margin="15px 15px 15px 0px"
+                                    Text="Description" />
+
+                                <TextBox
+                                    MinHeight="100px"
+                                    FontSize="12"
+                                    Padding="10px"
+                                    Margin="15px 5px 15px 0px"
+                                    TextWrapping="Wrap"
+                                    AcceptsReturn="True"
+                                    VerticalScrollBarVisibility="Auto"
+                                    IsReadOnly="True"
+                                    Text="{Binding Group.Description}" />
+
+                                <Button
+                                    Height="30px"
+                                    Margin="15px 15px 15px 0px"
+                                    FontSize="14"
+                                    Content="Delete group"
+                                    Command="{Binding DataContext.DeleteSelectedNodeCommand, RelativeSource={RelativeSource AncestorType=ContentControl}}" />
+
+                                <Expander
+                                    Margin="15px 15px 15px 50px"
+                                    FontSize="16"
+                                    Header="Editor">
+                                    <StackPanel>
+                                        <!-- edit title -->
+                                        <TextBlock
+                                            FontSize="14"
+                                            Margin="0px 10px 0px 0px"
+                                            Text="Title" />
+
+                                        <TextBox
+                                            FontSize="22"
+                                            Padding="8px"
+                                            Margin="0px 5px 0px 0px"
+                                            TextWrapping="Wrap"
+                                            Text="{Binding EditableTitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                                        <Button
+                                            Height="30px"
+                                            Margin="0px 10px 0px 0px"
+                                            FontSize="14"
+                                            Content="Save title"
+                                            Command="{Binding DataContext.SaveSelectedNodeTitleCommand, RelativeSource={RelativeSource AncestorType=ContentControl, AncestorLevel=2}}" />
+
+                                        <!-- edit description -->
+                                        <TextBlock
+                                            FontSize="14"
+                                            Margin="0px 15px 0px 0px"
+                                            Text="Description" />
+
+                                        <TextBox
+                                            MinHeight="100px"
+                                            FontSize="12"
+                                            Padding="10px"
+                                            Margin="0px 5px 0px 0px"
+                                            TextWrapping="Wrap"
+                                            AcceptsReturn="True"
+                                            VerticalScrollBarVisibility="Auto"
+                                            Text="{Binding EditableDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                                        <Button
+                                            Height="30px"
+                                            Margin="0px 10px 0px 0px"
+                                            FontSize="14"
+                                            Content="Save description"
+                                            Command="{Binding DataContext.SaveSelectedNodeDescriptionCommand, RelativeSource={RelativeSource AncestorType=ContentControl, AncestorLevel=2}}" />
+
+                                        <!-- colors -->
+                                    </StackPanel>
+                                </Expander>
+                            </StackPanel>
+
+                            <!-- file -->
+                            <StackPanel>
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsFile}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+
+                                <!-- title -->
+                                <TextBlock
+                                    FontSize="14"
+                                    Margin="15px 10px 15px 0px"
+                                    Text="Title" />
+
+                                <TextBlock
+                                    FontSize="22"
+                                    Margin="15px 10px 15px 0px"
+                                    d:Text="Title"
+                                    Text="{Binding Title}" />
+
+                                <!-- preview -->
+                                <Image
+                                    Width="300"
+                                    Height="225"
+                                    HorizontalAlignment="Center"
+                                    Margin="15px 20px 15px 0px"
+                                    Stretch="Uniform"
+                                    Source="/Resources/Images/image_placeholder.png" />
+
+                                <!-- tags -->
+                                <Expander
+                                    Margin="10px 20px 15px 0px"
+                                    Header="{Binding DataContext.SelectedItemTagsHeader, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    IsExpanded="False">
+
+                                    <ItemsControl
+                                        ItemsSource="{Binding DataContext.SelectedItemTags, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        Margin="15px 0px">
+
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel
+                                                    Orientation="Horizontal"
+                                                    HorizontalAlignment="Stretch" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border
+                                                    MinWidth="50px"
+                                                    Height="25px"
+                                                    Margin="0px 5px 10px 0px"
+                                                    Padding="10px 0px"
+                                                    Background="{Binding BackgroundColorHex, TargetNullValue=White}">
+
+                                                    <TextBlock
+                                                        VerticalAlignment="Center"
+                                                        HorizontalAlignment="Center"
+                                                        FontSize="12"
+                                                        Text="{Binding Name}"
+                                                        Foreground="{Binding ForegroundColorHex, TargetNullValue=Black}"
+                                                        TextTrimming="CharacterEllipsis" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Expander>
+                                
+                                <!--<Button
+                                    Width="300"
+                                    Height="30"
+                                    Margin="15px 8px 15px 0px"
+                                    Content="Open in player"
+                                    Command="{Binding DataContext.OpenSelectedFileCommand, RelativeSource={RelativeSource AncestorType=ContentControl}}" />-->
+
+                                <TextBlock
+                                    FontSize="16"
+                                    Margin="15px 20px 15px 0px"
+                                    Text="File info" />
+
+                                <!-- filename -->
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    Margin="15px 8px 15px 0px">
+                                    <TextBlock
+                                        Width="75px"
+                                        Text="Filename:" />
+                                    <TextBlock
+                                        TextTrimming="CharacterEllipsis"
+                                        Text="{Binding File.OriginalFilename}" />
+                                </StackPanel>
+
+                                <!-- size -->
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    Margin="15px 5px 15px 0px">
+                                    <TextBlock
+                                        Width="75px"
+                                        Text="Size:" />
+                                    <TextBlock Text="{Binding SizeText}" />
+                                </StackPanel>
+
+                                <!-- resolution -->
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    Margin="15px 5px 15px 0px">
+                                    <TextBlock
+                                        Width="75px"
+                                        Text="Resolution:" />
+                                    <TextBlock Text="{Binding Resolution}" />
+                                </StackPanel>
+
+                                <!-- duration -->
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    Margin="15px 5px 15px 0px">
+                                    <TextBlock
+                                        Width="75px"
+                                        Text="Duration:" />
+                                    <TextBlock Text="{Binding Duration}" />
+                                </StackPanel>
+
+                                <!-- hash -->
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    Margin="15px 5px 15px 0px">
+                                    <TextBlock
+                                        Width="75px"
+                                        Text="Hash:" />
+                                    <TextBlock
+                                        Width="365px"
+                                        TextTrimming="CharacterEllipsis"
+                                        TextWrapping="WrapWithOverflow"
+                                        Text="{Binding ContentHash}" />
+                                </StackPanel>
+
+                                <!-- notes -->
+                                <TextBlock
+                                    FontSize="14"
+                                    Margin="15px 20px 15px 0px"
+                                    Text="Notes" />
+
+                                <TextBox
+                                    MinHeight="140"
+                                    FontSize="12"
+                                    Padding="10px"
+                                    Margin="15px 5px 15px 0px"
+                                    TextWrapping="Wrap"
+                                    AcceptsReturn="True"
+                                    VerticalScrollBarVisibility="Auto"
+                                    IsReadOnly="True"
+                                    Text="{Binding File.Notes}" />
+
+                                <!-- references -->
+                                <Expander
+                                    Margin="15px 20px 15px 0px"
+                                    Header="{Binding DataContext.SelectedFileReferencesHeader, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    IsExpanded="False">
+
+                                    <ItemsControl
+                                        ItemsSource="{Binding DataContext.SelectedFileReferences, RelativeSource={RelativeSource AncestorType=UserControl}}">
+
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border
+                                                    Margin="0px 5px 0px 5px"
+                                                    Padding="10px"
+                                                    BorderThickness="0px 0px 0px 1px"
+                                                    BorderBrush="{StaticResource BaseColor3}">
+
+                                                    <StackPanel>
+
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock
+                                                                Width="75px"
+                                                                Opacity="0.65"
+                                                                Text="Provider:" />
+
+                                                            <TextBlock Text="{Binding ProviderText}" />
+                                                        </StackPanel>
+
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock
+                                                                Width="75px"
+                                                                Opacity="0.65"
+                                                                Text="Account:" />
+
+                                                            <TextBlock
+                                                                Width="200px"
+                                                                TextTrimming="CharacterEllipsis"
+                                                                Text="{Binding AccountText}" />
+                                                        </StackPanel>
+
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock
+                                                                Width="75px"
+                                                                Opacity="0.65"
+                                                                Text="State:" />
+
+                                                            <TextBlock Text="{Binding StateText}" />
+                                                        </StackPanel>
+
+                                                        <TextBlock
+                                                            Margin="0px 5px 0px 0px"
+                                                            Opacity="0.65"
+                                                            Text="Path:" />
+
+                                                        <TextBlock
+                                                            TextWrapping="Wrap"
+                                                            Text="{Binding LocationText}" />
+
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Expander>
+
+                                <!-- delete -->
+                                <Button
+                                    Height="30px"
+                                    Margin="15px 25px 15px 15px"
+                                    Content="Delete file"
+                                    Command="{Binding DataContext.DeleteSelectedNodeCommand, RelativeSource={RelativeSource AncestorType=ContentControl}}" />
+
+                                <!-- editor -->
+                                <Expander
+                                    Margin="15px 15px 15px 50px"
+                                    FontSize="16"
+                                    Header="Editor">
+                                    <StackPanel>
+                                        <!-- edit title -->
+                                        <TextBlock
+                                            FontSize="14"
+                                            Margin="0px 10px 0px 0px"
+                                            Text="Title" />
+
+                                        <TextBox
+                                            FontSize="22"
+                                            Padding="8px"
+                                            Margin="0px 5px 0px 0px"
+                                            TextWrapping="Wrap"
+                                            Text="{Binding EditableTitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                                        <Button
+                                            Height="30px"
+                                            Margin="0px 10px 0px 0px"
+                                            FontSize="14"
+                                            Content="Save title"
+                                            Command="{Binding DataContext.SaveSelectedNodeTitleCommand, RelativeSource={RelativeSource AncestorType=ContentControl, AncestorLevel=2}}" />
+
+                                        <!-- edit notes -->
+                                        <TextBlock
+                                            FontSize="14"
+                                            Margin="0px 15px 0px 0px"
+                                            Text="Notes" />
+
+                                        <TextBox
+                                            MinHeight="100px"
+                                            FontSize="12"
+                                            Padding="10px"
+                                            Margin="0px 5px 0px 0px"
+                                            TextWrapping="Wrap"
+                                            AcceptsReturn="True"
+                                            VerticalScrollBarVisibility="Auto"
+                                            Text="{Binding EditableNotes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                                        <Button
+                                            Height="30px"
+                                            Margin="0px 10px 0px 0px"
+                                            FontSize="14"
+                                            Content="Save Notes"
+                                            Command="{Binding DataContext.SaveSelectedNodeNotesCommand, RelativeSource={RelativeSource AncestorType=ContentControl, AncestorLevel=2}}" />
+
+                                    </StackPanel>
+                                </Expander>
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+                </ContentControl.ContentTemplate>
+            </ContentControl>
         </ScrollViewer>
     </Grid>
 </UserControl>

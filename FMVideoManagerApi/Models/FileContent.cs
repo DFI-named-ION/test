@@ -4,8 +4,6 @@
     {
         public string Hash { get; set; } = null!;
 
-        // public string HashAlgorithm { get; set; } = "SHA256";
-
         public long SizeBytes { get; set; }
 
         public string? MimeType { get; set; }

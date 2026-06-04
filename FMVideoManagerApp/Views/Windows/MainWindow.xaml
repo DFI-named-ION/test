@@ -11,7 +11,8 @@
         d:DataContext="{d:DesignInstance Type=viewModels:MainViewModel}"
         Title="FM" Height="750" Width="1000" SizeChanged="Window_SizeChanged"
         WindowStyle="None" ResizeMode="CanMinimize">
-    <Grid>
+    <Grid
+        Background="{StaticResource BaseColor1}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="75px" />
             <ColumnDefinition Width="*" />
@@ -25,75 +26,136 @@
         <StackPanel Grid.Row="0"
                     Grid.ColumnSpan="2"
                     Margin="0"
-                    Background="{StaticResource WhiteSmoke}"
+                    Background="{StaticResource BaseColor3}"
                     MouseDown="StackPanel_MouseDown">
             <Button Width="50px" Height="30px"
                     Padding="0px"
                     VerticalAlignment="Stretch" VerticalContentAlignment="Center"
                     HorizontalAlignment="Right" HorizontalContentAlignment="Center"
+                    Background="Transparent"
                     BorderThickness="0px"
                     Command="{Binding CloseWindowCommand}">
                 <Image Width="21px" Height="21px"
-                       Source="pack://application:,,,/Resources/Icons/x.png"/>
+                       Source="pack://application:,,,/Resources/Icons/x_inverted.png"/>
             </Button>
         </StackPanel>
         <!--left menu-->
-        <StackPanel
+        <DockPanel
             Grid.Row="0" Grid.Column="0"
             Grid.RowSpan="2"
             Visibility="{Binding LeftMenuVisibility}"
             VerticalAlignment="Stretch"
             HorizontalAlignment="Stretch"
             Margin="0px 30px 0px 0px"
-            Background="{StaticResource BaseColor4}">
+            Background="{StaticResource BaseColor2}"
+            LastChildFill="False">
             
-            <!--files button-->
-            <Button
-                VerticalAlignment="Center" VerticalContentAlignment="Center"
-                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                Padding="0px"
-                BorderThickness="0"
-                Background="Transparent"
-                Command="{Binding OpenFilesCommand}">
-                <StackPanel
-                    Margin="0px 5px">
-                    <Image
-                        Height="25px"
-                        Margin="0px"
-                        Source="/Resources/Icons/files.png"/>
-                    <Label
-                        VerticalContentAlignment="Center"
-                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                        FontSize="16"
-                        Padding="0px"
-                        Content="Files"/>
-                </StackPanel>
-            </Button>
+            <!--top stack-->
+            <StackPanel
+                DockPanel.Dock="Top">
+                
+                <!--files button-->
+                <Button
+                    VerticalAlignment="Center" VerticalContentAlignment="Center"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                    Padding="0px"
+                    BorderThickness="0"
+                    Background="Transparent"
+                    Command="{Binding OpenFilesCommand}">
+                    <StackPanel
+                        Margin="0px 5px">
+                        <Image
+                            Height="25px"
+                            Margin="0px"
+                            Source="/Resources/Icons/files.png"/>
+                        <Label
+                            VerticalContentAlignment="Center"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                            FontSize="16"
+                            Padding="0px"
+                            Content="Files"/>
+                    </StackPanel>
+                </Button>
+                
+                <!--hierarchy relations button-->
+                <Button
+                    VerticalAlignment="Center" VerticalContentAlignment="Center"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                    Padding="0px"
+                    BorderThickness="0"
+                    Background="Transparent"
+                    Command="{Binding OpenHierarchyRelationsCommand}">
+                    <StackPanel
+                        Margin="0px 5px">
+                        <Image
+                            Height="25px"
+                            Margin="0px"
+                            Source="/Resources/Icons/hierarchy-files.png"/>
+                        <Label
+                            VerticalContentAlignment="Center"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                            FontSize="16"
+                            Padding="0px"
+                            Content="Hierarchy"/>
+                    </StackPanel>
+                </Button>
+    
+                <!--settings button-->
+                <Button
+                    VerticalAlignment="Center" VerticalContentAlignment="Center"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                    Padding="0px"
+                    BorderThickness="0"
+                    Background="Transparent"
+                    Command="{Binding OpenSettingsCommand}">
+                    <StackPanel
+                        Margin="0px 5px">
+                        <Image
+                            Height="25px"
+                            Margin="0px"
+                            Source="/Resources/Icons/settings.png"/>
+                        <Label
+                            VerticalContentAlignment="Center"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                            FontSize="16"
+                            Padding="0px"
+                            Content="Settings"/>
+                    </StackPanel>
+                </Button>
+
+                <!--relations button-->
+                
+            </StackPanel>
             
-            <!--settings button-->
-            <Button
-                VerticalAlignment="Center" VerticalContentAlignment="Center"
-                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                Padding="0px"
-                BorderThickness="0"
-                Background="Transparent"
-                Command="{Binding OpenSettingsCommand}">
-                <StackPanel
-                    Margin="0px 5px">
-                    <Image
-                        Height="25px"
-                        Margin="0px"
-                        Source="/Resources/Icons/settings.png"/>
-                    <Label
-                        VerticalContentAlignment="Center"
-                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                        FontSize="16"
-                        Padding="0px"
-                        Content="Settings"/>
-                </StackPanel>
-            </Button>
-        </StackPanel>
-        
+            <!--bottom stack-->
+            <StackPanel
+                DockPanel.Dock="Bottom">
+                
+                <!--logout button-->
+                <Button
+                    VerticalAlignment="Center" VerticalContentAlignment="Center"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                    Padding="0px"
+                    BorderThickness="0"
+                    Background="Transparent"
+                    Command="{Binding LogOutCommand}">
+                    <StackPanel
+                        Margin="0px 5px">
+                        <Image
+                            Height="25px"
+                            Margin="0px"
+                            Source="/Resources/Icons/exit.png"/>
+                        <Label
+                            VerticalContentAlignment="Center"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                            FontSize="16"
+                            Padding="0px"
+                            Content="Log out"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </DockPanel>
+
         <!--components-->
         <ContentControl
             Grid.Row="1"
@@ -104,9 +166,11 @@
         <Label Grid.Row="2" 
                Grid.ColumnSpan="2"
                Padding="0" Margin="0"
-               Background="{StaticResource DarkerWhiteSmoke}"
+               Background="{StaticResource BaseColor3}"
+               Foreground="White"
                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                VerticalAlignment="Stretch" VerticalContentAlignment="Center"
+               d:Content="asdasd"
                Content="{Binding Message}" />
     </Grid>
 </Window>

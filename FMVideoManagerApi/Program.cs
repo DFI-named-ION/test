@@ -1,4 +1,5 @@
 
+using FFMpegCore;
 using FMVideoManagerApi.Data;
 using FMVideoManagerApi.Data.Repositories.UserRepository;
 using FMVideoManagerApi.Models;
@@ -21,19 +22,19 @@ namespace FMVideoManagerApi
             builder.Services.Configure<JwtOptions>(
                 builder.Configuration.GetSection("Jwt"));
 
-            JwtOptions jwtOptions = builder.Configuration
-                .GetSection("Jwt")
-                .Get<JwtOptions>()!;
+            JwtOptions jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>()!;
 
             byte[] keyBytes = Encoding.UTF8.GetBytes(jwtOptions.Secret);
 
             builder.Services.AddDbContext<ServerDbContext>(options =>
             {
                 options.UseSqlite(builder.Configuration.GetConnectionString("ServerDb"));
+                options.EnableSensitiveDataLogging(); // remove
             });
 
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<JwtTokenService>();
+            builder.Services.AddScoped<DropboxStorageIndexingService>();
 
             builder.Services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -60,6 +61,12 @@ namespace FMVideoManagerApi
 
             builder.Services.AddAuthorization();
 
+            builder.Services.Configure<DropboxOptions>(builder.Configuration.GetSection("Dropbox"));
+            builder.Services.AddHttpClient();
+            builder.Services.AddDataProtection();
+
+            builder.Services.AddSingleton<TokenProtector>();
+
             var app = builder.Build();
 
             try
@@ -85,6 +92,11 @@ namespace FMVideoManagerApi
             app.MapControllers();
 
             app.Run();
+
+            GlobalFFOptions.Configure(new FFOptions
+            {
+                BinaryFolder = Path.Combine(AppContext.BaseDirectory, "Resources", "Exec")
+            });
         }
     }
 }

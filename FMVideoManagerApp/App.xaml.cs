@@ -1,9 +1,7 @@
 ﻿using FMVideoManagerApp.Data;
-using FMVideoManagerApp.Data.Repositories;
-using FMVideoManagerApp.Data.Repositories.FileRepository;
-using FMVideoManagerApp.Data.Repositories.UserPathRepository;
+using FMVideoManagerApp.Data.Repositories.LocalFileLocationRepository;
+using FMVideoManagerApp.Data.Repositories.LocalIndexedPathRepository;
 using FMVideoManagerApp.Services;
-using FMVideoManagerApp.Services.Interfaces;
 using FMVideoManagerApp.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,7 +14,7 @@ namespace FMVideoManagerApp
         private ServiceProvider _serviceProvider = null!;
         private ApplicationService _applicationService = null!;
 
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
@@ -27,20 +25,32 @@ namespace FMVideoManagerApp
                 options.UseSqlite(LocalDatabase.GetConnectionString());
             });
 
+            services.AddHttpClient<ApiClient>(client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:7049/");
+                client.Timeout = TimeSpan.FromMinutes(60); // 5
+            });
+
             // repos
-            services.AddSingleton<IUserRepository, UserRepository>();
-            services.AddSingleton<IFileRepository, FileRepository>();
-            services.AddSingleton<IUserPathRepository, UserPathRepository>();
+            services.AddSingleton<ILocalIndexedPathRepository, LocalIndexedPathRepository>();
+            services.AddSingleton<ILocalFileLocationRepository, LocalFileLocationRepository>();
 
             // services
             services.AddSingleton<MessageService>();
+            services.AddSingleton<LocalDeviceService>();
+            services.AddSingleton<TokenStore>();
             services.AddSingleton<AuthService>();
+            services.AddSingleton<LocalIndexedPathService>();
             services.AddSingleton<FileIndexingService>();
+            services.AddSingleton<FileLibraryService>();
+            services.AddSingleton<HierarchyService>();
+            services.AddSingleton<TagService>();
 
             // viewmodels
             services.AddSingleton<MainViewModel>();
             services.AddSingleton<LogInViewModel>();
             services.AddSingleton<FileListViewModel>();
+            services.AddSingleton<HierarchyRelationsViewModel>();
             services.AddSingleton<SettingsViewModel>();
 
             // windows
@@ -57,7 +67,7 @@ namespace FMVideoManagerApp
             LocalDatabase.Initialize(_serviceProvider);
 
             _applicationService = _serviceProvider.GetRequiredService<ApplicationService>();
-            _applicationService.Initialize();
+            await _applicationService.InitializeAsync();
         }
 
         protected override void OnExit(ExitEventArgs e)

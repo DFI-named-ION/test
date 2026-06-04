@@ -1,106 +1,80 @@
-﻿using FMVideoManagerApp.Core;
-using FMVideoManagerApp.Data.Repositories;
-using FMVideoManagerApp.Models;
+﻿using FMVideoManagerApp.Data.DTO;
 
 namespace FMVideoManagerApp.Services
 {
-    public sealed class AuthService : ObservableObject
+    public sealed class AuthService
     {
-        private IUserRepository _userRepo;
+        private readonly ApiClient _apiClient;
+        private readonly TokenStore _tokenStore;
 
-        private AppUser _user = null!;
+        public event Action<AuthResponse>? LoggedIn;
+        public event Action? LoggedOut;
 
-        private bool _isAuthenticated = false;
-        public bool IsAuthenticated
+        public AuthResponse? CurrentUser { get; private set; }
+
+        public bool IsLoggedIn => CurrentUser != null;
+        public bool HasSavedToken => _tokenStore.HasAccessToken;
+
+        public AuthService(ApiClient apiClient, TokenStore tokenStore)
         {
-            get => _isAuthenticated;
-            internal set
-            {
-                if (_isAuthenticated != value)
-                {
-                    _isAuthenticated = value;
-                    OnPropertyChanged(nameof(IsAuthenticated));
-                }
-            }
+            _apiClient = apiClient;
+            _tokenStore = tokenStore;
         }
 
-        public event Action OnLogIn;
-
-        public AuthService(IUserRepository userRepo)
+        public async Task<AuthResponse> LoginAsync(string login, string password)
         {
-            _userRepo = userRepo;
+            AuthResponse response = await _apiClient.LoginAsync(login, password);
+
+            CurrentUser = response;
+            _tokenStore.SetAccessToken(response.AccessToken);
+
+            LoggedIn?.Invoke(response);
+
+            return response;
         }
 
-        public bool LogIn(string login, string password)
+        public async Task<AuthResponse> RegisterAsync(string login, string password, string alias)
         {
-            try
-            {
-                var user = _userRepo.FindByLogin(login);
+            AuthResponse response = await _apiClient.RegisterAsync(login, password, alias);
 
-                if (user is null)
-                    return false;
+            CurrentUser = response;
+            _tokenStore.SetAccessToken(response.AccessToken);
 
-                if (!CryptographyService.VerifyPasswordHash(password, user.Password))
-                    return false;
+            LoggedIn?.Invoke(response);
 
-                _user = user;
-                IsAuthenticated = true;
-                OnLogIn?.Invoke();
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error during loging in");
-            }
+            return response;
         }
 
-        public bool Register(string login, string password, string alias = "")
+        public async Task<AuthResponse> LoadCurrentUserAsync()
         {
-            try
+            AuthResponse response = await _apiClient.GetMeAsync();
+
+            CurrentUser = response;
+
+            if (!string.IsNullOrWhiteSpace(response.AccessToken))
             {
-                string passwordHash = CryptographyService.HashPassword(password);
-
-                var user = new AppUser
-                {
-                    Login = login,
-                    Password = passwordHash,
-                    Alias = GenerateAlias()
-                };
-
-                _userRepo.Add(user);
-
-                return LogIn(login, password);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error during registering");
-            }
-        }
-
-        public void LogOut()
-        {
-            _user = null!;
-            IsAuthenticated = false;
-        }
-
-        public AppUser GetUser()
-        {
-            return _user;
-        }
-
-        private string GenerateAlias()
-        {
-            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            var alias = new char[12];
-            var random = new Random();
-
-            for (int i = 0; i < alias.Length; i++)
-            {
-                alias[i] = chars[random.Next(chars.Length)];
+                _tokenStore.SetAccessToken(response.AccessToken);
             }
 
-            return new string(alias);
+            LoggedIn?.Invoke(response);
+
+            return response;
+        }
+
+        public long GetCurrentUserId()
+        {
+            if (CurrentUser == null)
+                throw new InvalidOperationException("User is not logged in.");
+
+            return CurrentUser.UserId;
+        }
+
+        public void Logout()
+        {
+            CurrentUser = null;
+            _tokenStore.Clear();
+
+            LoggedOut?.Invoke();
         }
     }
 }

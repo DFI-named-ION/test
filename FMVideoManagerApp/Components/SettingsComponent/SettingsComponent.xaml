@@ -54,85 +54,93 @@
                 VerticalAlignment="Top"
                 HorizontalAlignment="Stretch"
                 Margin="50px 25px 50px 0px">
-                <!--paths-->
-                <StackPanel
-                    Orientation="Horizontal">
-                    <Label
-                        FontSize="24"
-                        Padding="0"
-                        Content="Paths:"/>
-                    <!--add path-->
-                    <Button
-                        Width="35px"
-                        VerticalAlignment="Stretch" VerticalContentAlignment="Center"
-                        HorizontalAlignment="Left" HorizontalContentAlignment="Center"
-                        FontSize="16"
-                        Padding="0px"
-                        Margin="5px 0px 0px 0px"
-                        Command="{Binding AddPathCommand}">
-                        <Image
-                            Height="25px"
-                            Source="/Resources/Icons/plus.png"/>
-                    </Button>
-                </StackPanel>
-                <!--path list-->
-                <StackPanel
-                    VerticalAlignment="Top"
-                    HorizontalAlignment="Left">
-                    <ListBox
-                        x:Name="pathsListBox"
-                        Padding="0px"
-                        Margin="0px"
-                        Background="Transparent"
-                        d:ItemsSource="{d:SampleData ItemCount=4}"
-                        ItemsSource="{Binding Paths}">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <!--path-->
-                                <StackPanel
-                                    Orientation="Horizontal"
-                                    VerticalAlignment="Top"
-                                    HorizontalAlignment="Stretch"
-                                    Margin="15px 5px 0px 0px">
-                                    <!--path text-->
-                                    <TextBox
-                                        MaxWidth="725px"
-                                        FontSize="16"
-                                        Padding="5px 5px"
-                                        d:Text="C:\Users\lar\Videos\Res\Replay 20C:\Users\la 2026-05s\Replay 20C:\Users\la-13 22lit\Videos\Replay 20C:\Users\lat\Videos\"
-                                        Text="{Binding Path=Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <!--remove path-->
-                                    <Button
-                                        Width="35px"
-                                        VerticalAlignment="Stretch" VerticalContentAlignment="Center"
-                                        HorizontalAlignment="Left" HorizontalContentAlignment="Center"
-                                        FontSize="16"
-                                        Padding="0px"
-                                        Margin="15px 0px 0px 0px"
-                                        Command="{Binding DataContext.RemovePathCommand, ElementName=pathsListBox}" CommandParameter="{Binding}">
-                                        <Image
-                                            Height="25px"
-                                            Source="/Resources/Icons/minus.png"/>
-                                    </Button>
-                                    <!--copy path-->
-                                    <Button
-                                        Width="35px"
-                                        VerticalAlignment="Stretch" VerticalContentAlignment="Center"
-                                        HorizontalAlignment="Left" HorizontalContentAlignment="Center"
-                                        FontSize="16"
-                                        Padding="0px"
-                                        Margin="5px 0px 0px 0px"
-                                        Command="{Binding DataContext.CopyPathCommand, ElementName=pathsListBox}" CommandParameter="{Binding}">
-                                        <Image
-                                            Height="25px"
-                                            Source="/Resources/Icons/copy.png"/>
-                                    </Button>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </StackPanel>
                 
+                <!--paths-->
+                <StackPanel>
+                    <!--path label-->
+                    <StackPanel
+                        Orientation="Horizontal">
+                        <Label
+                            FontSize="24"
+                            Padding="0"
+                            Content="Paths:"/>
+                        <!--add path-->
+                        <Button
+                            Width="35px"
+                            VerticalAlignment="Stretch" VerticalContentAlignment="Center"
+                            HorizontalAlignment="Left" HorizontalContentAlignment="Center"
+                            FontSize="16"
+                            Padding="0px"
+                            Margin="5px 0px 0px 0px"
+                            Command="{Binding AddPathCommand}">
+                            <Image
+                                Height="25px"
+                                Source="/Resources/Icons/plus.png"/>
+                        </Button>
+                    </StackPanel>
+                    <!--path list-->
+                    <StackPanel
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Left">
+                        <ListBox
+                            x:Name="pathsListBox"
+                            Padding="0px"
+                            Margin="0px"
+                            Background="Transparent"
+                            BorderThickness="0px"
+                            d:ItemsSource="{d:SampleData ItemCount=4}"
+                            ItemsSource="{Binding Paths}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <!--path-->
+                                    <StackPanel
+                                        Orientation="Horizontal"
+                                        VerticalAlignment="Top"
+                                        HorizontalAlignment="Stretch"
+                                        Margin="15px 5px 0px 0px">
+                                        <!--path text-->
+                                        <TextBox
+                                            MaxWidth="725px"
+                                            FontSize="16"
+                                            Padding="5px 5px"
+                                            IsReadOnly="True"
+                                            d:Text="C:\Users\lar\Videos\Res\Replay 20C:\Users\la 2026-05s\Replay 20C:\Users\la-13 22lit\Videos\Replay 20C:\Users\lat\Videos\"
+                                            Text="{Binding Path=Path, Mode=OneWay}" />
+
+                                        <!--remove path-->
+                                        <Button
+                                            Width="35px"
+                                            VerticalAlignment="Stretch" VerticalContentAlignment="Center"
+                                            HorizontalAlignment="Left" HorizontalContentAlignment="Center"
+                                            FontSize="16"
+                                            Padding="0px"
+                                            Margin="15px 0px 0px 0px"
+                                            Command="{Binding DataContext.RemovePathCommand, ElementName=pathsListBox}" CommandParameter="{Binding}">
+                                            <Image
+                                                Height="25px"
+                                                Source="/Resources/Icons/minus.png"/>
+                                        </Button>
+
+                                        <!--copy path-->
+                                        <Button
+                                            Width="35px"
+                                            VerticalAlignment="Stretch" VerticalContentAlignment="Center"
+                                            HorizontalAlignment="Left" HorizontalContentAlignment="Center"
+                                            FontSize="16"
+                                            Padding="0px"
+                                            Margin="5px 0px 0px 0px"
+                                            Command="{Binding DataContext.CopyPathCommand, ElementName=pathsListBox}" CommandParameter="{Binding}">
+                                            <Image
+                                                Height="25px"
+                                                Source="/Resources/Icons/copy.png"/>
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </StackPanel>
+
                 <!--columns-->
                 <DockPanel
                     Margin="0px 20px 0px 0px">
@@ -157,6 +165,135 @@
                         Minimum="1" Maximum="6"
                         Value="{Binding ColumnsCount}"/>
                 </DockPanel>
+
+                <!--cloud stotages accounts-->
+                <StackPanel
+                    Margin="0px 20px 0px 0px">
+                    <!--label + button-->
+                    <StackPanel
+                        Orientation="Horizontal">
+                        <Label
+                            FontSize="24"
+                            Padding="0"
+                            Content="Cloud connections:"/>
+                        <!--refresh-->
+                        <Button
+                            Width="35px"
+                            VerticalAlignment="Stretch" VerticalContentAlignment="Center"
+                            HorizontalAlignment="Left" HorizontalContentAlignment="Center"
+                            FontSize="16"
+                            Padding="0px"
+                            Margin="5px 0px 0px 0px"
+                            Command="{Binding RefreshCloudAccountsCommand}">
+                            <Image
+                                Height="25px"
+                                Source="/Resources/Icons/refresh.png"/>
+                        </Button>
+                    </StackPanel>
+                    
+                    <!--dropbox accounts-->
+                    <StackPanel
+                        Margin="15px 0px 0px 0px">
+                        <!--label + button-->
+                        <StackPanel
+                            Orientation="Horizontal">
+                            <Label
+                                FontSize="20"
+                                Padding="0"
+                                Content="Dropbox"/>
+                            <!--connect-->
+                            <Button
+                                Width="35px"
+                                VerticalAlignment="Stretch" VerticalContentAlignment="Center"
+                                HorizontalAlignment="Left" HorizontalContentAlignment="Center"
+                                FontSize="16"
+                                Padding="0px"
+                                Margin="5px 0px 0px 0px"
+                                Command="{Binding ConnectDropboxCommand}">
+                                <Image
+                                    Height="25px"
+                                    Source="/Resources/Icons/plus.png"/>
+                            </Button>
+                        </StackPanel>
+
+                        <!--accounts list-->
+                        <ListBox
+                            x:Name="dropboxAccountsListBox"
+                            Padding="0px"
+                            Margin="0px"
+                            Background="Transparent"
+                            BorderThickness="0px"
+                            d:ItemsSource="{d:SampleData ItemCount=4}"
+                            ItemsSource="{Binding CloudAccounts}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <!--accounts-->
+                                    <StackPanel
+                                        Orientation="Horizontal"
+                                        VerticalAlignment="Top"
+                                        HorizontalAlignment="Stretch"
+                                        Margin="15px 5px 0px 0px">
+                                        <!--status + account email-->
+                                        <Label
+                                            Padding="0px 5px 0px 0px"
+                                            FontSize="16"
+                                            Content="Status: "/>
+                                        <Label
+                                            Padding="0px 5px 0px 0px"
+                                            FontSize="16"
+                                            d:Content="Active"
+                                            Content="{Binding IsActiveText}"/>
+                                        <Label
+                                            Padding="15px 5px 0px 0px"
+                                            FontSize="16"
+                                            d:Content="somemail@mail.com"
+                                            Content="{Binding AccountText}"/>
+
+                                        <!--activate account-->
+                                        <Button
+                                            Width="100px"
+                                            VerticalAlignment="Stretch" VerticalContentAlignment="Center"
+                                            HorizontalAlignment="Left" HorizontalContentAlignment="Center"
+                                            FontSize="16"
+                                            Padding="0px"
+                                            Margin="15px 0px 0px 0px"
+                                            Content="Activate"
+                                            IsEnabled="{Binding IsInactive}"
+                                            Command="{Binding DataContext.ActivateCloudAccountCommand, ElementName=dropboxAccountsListBox}" CommandParameter="{Binding}"/>
+
+                                        <!--deactivate account-->
+                                        <Button
+                                            Width="100px"
+                                            VerticalAlignment="Stretch" VerticalContentAlignment="Center"
+                                            HorizontalAlignment="Left" HorizontalContentAlignment="Center"
+                                            FontSize="16"
+                                            Padding="0px"
+                                            Margin="5px 0px 0px 0px"
+                                            Content="Deactivate"
+                                            IsEnabled="{Binding IsActive}"
+                                            Command="{Binding DataContext.DeactivateCloudAccountCommand, ElementName=dropboxAccountsListBox}" CommandParameter="{Binding}"/>
+                                        
+                                        <!--disconnect account-->
+                                        <Button
+                                            Width="35px"
+                                            VerticalAlignment="Stretch" VerticalContentAlignment="Center"
+                                            HorizontalAlignment="Left" HorizontalContentAlignment="Center"
+                                            FontSize="16"
+                                            Padding="0px"
+                                            Margin="5px 0px 0px 0px"
+                                            Command="{Binding DataContext.RemoveCloudAccountCommand, ElementName=dropboxAccountsListBox}" CommandParameter="{Binding}">
+                                            <Image
+                                                Height="25px"
+                                                Source="/Resources/Icons/minus.png"/>
+                                        </Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </StackPanel>
+                
+                <!--indexing order-->
             </StackPanel>
         </ScrollViewer>
     </Grid>

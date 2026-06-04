@@ -10,7 +10,7 @@
 
         public string? ContentHash { get; set; }
 
-        public long CloudProviderAccountId { get; set; }
+        public long? CloudProviderAccountId { get; set; }
 
         public CloudProviderType Provider { get; set; }
 
@@ -36,7 +36,7 @@
 
         public AppUser User { get; set; } = null!;
 
-        public CloudProviderAccount CloudProviderAccount { get; set; } = null!;
+        public CloudProviderAccount? CloudProviderAccount { get; set; } = null!;
 
         public FileItem? FileItem { get; set; }
 

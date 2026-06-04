@@ -17,7 +17,7 @@ namespace FMVideoManagerApp.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.15");
 
-            modelBuilder.Entity("FMVideoManagerApp.Models.Local.LocalFileLocation", b =>
+            modelBuilder.Entity("FMVideoManagerApp.Models.LocalFileLocation", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -48,6 +48,14 @@ namespace FMVideoManagerApp.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("last_seen_utc");
 
+                    b.Property<string>("LastSyncError")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("last_sync_error");
+
+                    b.Property<DateTime?>("LastSyncedAtUtc")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("last_synced_at_utc");
+
                     b.Property<long?>("LocalIndexedPathId")
                         .HasColumnType("INTEGER")
                         .HasColumnName("local_indexed_path_id");
@@ -69,6 +77,10 @@ namespace FMVideoManagerApp.Migrations
                         .HasColumnType("INTEGER")
                         .HasColumnName("size_bytes");
 
+                    b.Property<int>("SyncState")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("sync_state");
+
                     b.HasKey("Id")
                         .HasName("PK_local_file_location");
 
@@ -87,7 +99,7 @@ namespace FMVideoManagerApp.Migrations
                     b.ToTable("local_file_location", (string)null);
                 });
 
-            modelBuilder.Entity("FMVideoManagerApp.Models.Local.LocalIndexedPath", b =>
+            modelBuilder.Entity("FMVideoManagerApp.Models.LocalIndexedPath", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -133,7 +145,7 @@ namespace FMVideoManagerApp.Migrations
                     b.ToTable("local_indexed_path", (string)null);
                 });
 
-            modelBuilder.Entity("FMVideoManagerApp.Models.Local.PreviewCache", b =>
+            modelBuilder.Entity("FMVideoManagerApp.Models.PreviewCache", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -190,9 +202,9 @@ namespace FMVideoManagerApp.Migrations
                     b.ToTable("preview_cache", (string)null);
                 });
 
-            modelBuilder.Entity("FMVideoManagerApp.Models.Local.LocalFileLocation", b =>
+            modelBuilder.Entity("FMVideoManagerApp.Models.LocalFileLocation", b =>
                 {
-                    b.HasOne("FMVideoManagerApp.Models.Local.LocalIndexedPath", "LocalIndexedPath")
+                    b.HasOne("FMVideoManagerApp.Models.LocalIndexedPath", "LocalIndexedPath")
                         .WithMany()
                         .HasForeignKey("LocalIndexedPathId")
                         .OnDelete(DeleteBehavior.SetNull)

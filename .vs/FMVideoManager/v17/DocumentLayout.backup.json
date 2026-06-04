@@ -3,12 +3,28 @@
   "WorkspaceRootPath": "C:\\Users\\larit\\source\\repos\\F-F\\FMVideoManager\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{87991517-4268-4BF2-99D0-AA111269E667}|FMVideoManagerApp\\FMVideoManagerApp.csproj|c:\\users\\larit\\source\\repos\\f-f\\fmvideomanager\\fmvideomanagerapp\\viewmodels\\loginviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{87991517-4268-4BF2-99D0-AA111269E667}|FMVideoManagerApp\\FMVideoManagerApp.csproj|solutionrelative:fmvideomanagerapp\\viewmodels\\loginviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E3456396-F82A-44E2-A885-803B7CE3993B}|FMVideoManagerApi\\FMVideoManagerApi.csproj|c:\\users\\larit\\source\\repos\\f-f\\fmvideomanager\\fmvideomanagerapi\\services\\dropboxstorageindexingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E3456396-F82A-44E2-A885-803B7CE3993B}|FMVideoManagerApi\\FMVideoManagerApi.csproj|solutionrelative:fmvideomanagerapi\\services\\dropboxstorageindexingservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E3456396-F82A-44E2-A885-803B7CE3993B}|FMVideoManagerApi\\FMVideoManagerApi.csproj|c:\\users\\larit\\source\\repos\\f-f\\fmvideomanager\\fmvideomanagerapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{E3456396-F82A-44E2-A885-803B7CE3993B}|FMVideoManagerApi\\FMVideoManagerApi.csproj|solutionrelative:fmvideomanagerapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+      "AbsoluteMoniker": "D:0:0:{E3456396-F82A-44E2-A885-803B7CE3993B}|FMVideoManagerApi\\FMVideoManagerApi.csproj|c:\\users\\larit\\source\\repos\\f-f\\fmvideomanager\\fmvideomanagerapi\\controllers\\dropboxcloudcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E3456396-F82A-44E2-A885-803B7CE3993B}|FMVideoManagerApi\\FMVideoManagerApi.csproj|solutionrelative:fmvideomanagerapi\\controllers\\dropboxcloudcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{87991517-4268-4BF2-99D0-AA111269E667}|FMVideoManagerApp\\FMVideoManagerApp.csproj|c:\\users\\larit\\source\\repos\\f-f\\fmvideomanager\\fmvideomanagerapp\\components\\hierarchyrelationscomponent\\hierarchyrelationscomponent.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{87991517-4268-4BF2-99D0-AA111269E667}|FMVideoManagerApp\\FMVideoManagerApp.csproj|solutionrelative:fmvideomanagerapp\\components\\hierarchyrelationscomponent\\hierarchyrelationscomponent.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{87991517-4268-4BF2-99D0-AA111269E667}|FMVideoManagerApp\\FMVideoManagerApp.csproj|c:\\users\\larit\\source\\repos\\f-f\\fmvideomanager\\fmvideomanagerapp\\viewmodels\\hierarchyrelationsviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{87991517-4268-4BF2-99D0-AA111269E667}|FMVideoManagerApp\\FMVideoManagerApp.csproj|solutionrelative:fmvideomanagerapp\\viewmodels\\hierarchyrelationsviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{87991517-4268-4BF2-99D0-AA111269E667}|FMVideoManagerApp\\FMVideoManagerApp.csproj|c:\\users\\larit\\source\\repos\\f-f\\fmvideomanager\\fmvideomanagerapp\\viewmodels\\filelistviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{87991517-4268-4BF2-99D0-AA111269E667}|FMVideoManagerApp\\FMVideoManagerApp.csproj|solutionrelative:fmvideomanagerapp\\viewmodels\\filelistviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{87991517-4268-4BF2-99D0-AA111269E667}|FMVideoManagerApp\\FMVideoManagerApp.csproj|c:\\users\\larit\\source\\repos\\f-f\\fmvideomanager\\fmvideomanagerapp\\services\\hierarchyservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{87991517-4268-4BF2-99D0-AA111269E667}|FMVideoManagerApp\\FMVideoManagerApp.csproj|solutionrelative:fmvideomanagerapp\\services\\hierarchyservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,8 +34,21 @@
       "DocumentGroups": [
         {
           "DockedHeight": 62,
-          "SelectedChildIndex": 10,
+          "SelectedChildIndex": 0,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "DropboxStorageIndexingService.cs",
+              "DocumentMoniker": "C:\\Users\\larit\\source\\repos\\F-F\\FMVideoManager\\FMVideoManagerApi\\Services\\DropboxStorageIndexingService.cs",
+              "RelativeDocumentMoniker": "FMVideoManagerApi\\Services\\DropboxStorageIndexingService.cs",
+              "ToolTip": "C:\\Users\\larit\\source\\repos\\F-F\\FMVideoManager\\FMVideoManagerApi\\Services\\DropboxStorageIndexingService.cs",
+              "RelativeToolTip": "FMVideoManagerApi\\Services\\DropboxStorageIndexingService.cs",
+              "ViewState": "AgIAAAgBAAAAAAAAAAAIwCMBAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-04T13:27:10.364Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
@@ -62,34 +91,71 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "LogInViewModel.cs",
-              "DocumentMoniker": "C:\\Users\\larit\\source\\repos\\F-F\\FMVideoManager\\FMVideoManagerApp\\ViewModels\\LogInViewModel.cs",
-              "RelativeDocumentMoniker": "FMVideoManagerApp\\ViewModels\\LogInViewModel.cs",
-              "ToolTip": "C:\\Users\\larit\\source\\repos\\F-F\\FMVideoManager\\FMVideoManagerApp\\ViewModels\\LogInViewModel.cs",
-              "RelativeToolTip": "FMVideoManagerApp\\ViewModels\\LogInViewModel.cs",
-              "ViewState": "AgIAAB8AAAAAAAAAAAAowEUAAABAAAAAAAAAAA==",
+              "DocumentIndex": 1,
+              "Title": "DropboxCloudController.cs",
+              "DocumentMoniker": "C:\\Users\\larit\\source\\repos\\F-F\\FMVideoManager\\FMVideoManagerApi\\Controllers\\DropboxCloudController.cs",
+              "RelativeDocumentMoniker": "FMVideoManagerApi\\Controllers\\DropboxCloudController.cs",
+              "ToolTip": "C:\\Users\\larit\\source\\repos\\F-F\\FMVideoManager\\FMVideoManagerApi\\Controllers\\DropboxCloudController.cs",
+              "RelativeToolTip": "FMVideoManagerApi\\Controllers\\DropboxCloudController.cs",
+              "ViewState": "AgIAAMIAAAAAAAAAAAAIwNQAAABNAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-21T21:45:45.576Z",
+              "WhenOpened": "2026-06-04T13:26:55.108Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\Users\\larit\\source\\repos\\F-F\\FMVideoManager\\FMVideoManagerApi\\appsettings.json",
-              "RelativeDocumentMoniker": "FMVideoManagerApi\\appsettings.json",
-              "ToolTip": "C:\\Users\\larit\\source\\repos\\F-F\\FMVideoManager\\FMVideoManagerApi\\appsettings.json*",
-              "RelativeToolTip": "FMVideoManagerApi\\appsettings.json*",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAPAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-05-21T21:41:55.362Z",
+              "DocumentIndex": 4,
+              "Title": "FileListViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\larit\\source\\repos\\F-F\\FMVideoManager\\FMVideoManagerApp\\ViewModels\\FileListViewModel.cs",
+              "RelativeDocumentMoniker": "FMVideoManagerApp\\ViewModels\\FileListViewModel.cs",
+              "ToolTip": "C:\\Users\\larit\\source\\repos\\F-F\\FMVideoManager\\FMVideoManagerApp\\ViewModels\\FileListViewModel.cs",
+              "RelativeToolTip": "FMVideoManagerApp\\ViewModels\\FileListViewModel.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAUwBcAAAA0AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-04T12:40:16.055Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "HierarchyRelationsViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\larit\\source\\repos\\F-F\\FMVideoManager\\FMVideoManagerApp\\ViewModels\\HierarchyRelationsViewModel.cs",
+              "RelativeDocumentMoniker": "FMVideoManagerApp\\ViewModels\\HierarchyRelationsViewModel.cs",
+              "ToolTip": "C:\\Users\\larit\\source\\repos\\F-F\\FMVideoManager\\FMVideoManagerApp\\ViewModels\\HierarchyRelationsViewModel.cs",
+              "RelativeToolTip": "FMVideoManagerApp\\ViewModels\\HierarchyRelationsViewModel.cs",
+              "ViewState": "AgIAAEMBAAAAAAAAAAA4wMkBAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-03T14:23:28.012Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "HierarchyRelationsComponent.xaml",
+              "DocumentMoniker": "C:\\Users\\larit\\source\\repos\\F-F\\FMVideoManager\\FMVideoManagerApp\\Components\\HierarchyRelationsComponent\\HierarchyRelationsComponent.xaml",
+              "RelativeDocumentMoniker": "FMVideoManagerApp\\Components\\HierarchyRelationsComponent\\HierarchyRelationsComponent.xaml",
+              "ToolTip": "C:\\Users\\larit\\source\\repos\\F-F\\FMVideoManager\\FMVideoManagerApp\\Components\\HierarchyRelationsComponent\\HierarchyRelationsComponent.xaml",
+              "RelativeToolTip": "FMVideoManagerApp\\Components\\HierarchyRelationsComponent\\HierarchyRelationsComponent.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-06-03T11:35:09.945Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "HierarchyService.cs",
+              "DocumentMoniker": "C:\\Users\\larit\\source\\repos\\F-F\\FMVideoManager\\FMVideoManagerApp\\Services\\HierarchyService.cs",
+              "RelativeDocumentMoniker": "FMVideoManagerApp\\Services\\HierarchyService.cs",
+              "ToolTip": "C:\\Users\\larit\\source\\repos\\F-F\\FMVideoManager\\FMVideoManagerApp\\Services\\HierarchyService.cs",
+              "RelativeToolTip": "FMVideoManagerApp\\Services\\HierarchyService.cs",
+              "ViewState": "AgIAAA4AAAAAAAAAAAA1wDUBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-02T20:01:21.176Z"
             }
           ]
         },
         {
-          "DockedHeight": 310,
+          "DockedHeight": 62,
           "SelectedChildIndex": -1,
           "Children": [
             {
@@ -115,7 +181,7 @@
           ]
         },
         {
-          "DockedHeight": 128,
+          "DockedHeight": 310,
           "SelectedChildIndex": -1,
           "Children": [
             {

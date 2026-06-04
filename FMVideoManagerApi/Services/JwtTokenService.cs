@@ -21,16 +21,14 @@ namespace FMVideoManagerApi.Services
             byte[] keyBytes = Encoding.UTF8.GetBytes(_options.Secret);
 
             var claims = new List<Claim>
-        {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.Login),
-            new Claim("alias", user.Alias)
-        };
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Login),
+                new Claim("alias", user.Alias)
+            };
 
-            var credentials = new SigningCredentials(
-                new SymmetricSecurityKey(keyBytes),
-                SecurityAlgorithms.HmacSha256);
+            var credentials = new SigningCredentials(new SymmetricSecurityKey(keyBytes), SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
                 issuer: _options.Issuer,

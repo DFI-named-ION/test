@@ -1,0 +1,691 @@
+﻿<UserControl x:Class="FMVideoManagerApp.Components.HierarchyRelationsComponent.HierarchyRelationsComponent"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FMVideoManagerApp.Components.HierarchyRelationsComponent"
+             xmlns:viewModels="clr-namespace:FMVideoManagerApp.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=viewModels:HierarchyRelationsViewModel}"
+             d:DesignHeight="630" d:DesignWidth="1000">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="HierarchyRelationsComponentStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="75px"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <TabControl
+            Grid.Column="1"
+            Padding="0px"
+            Background="Transparent"
+            BorderThickness="0px">
+            <TabItem Header="Groups and Files">
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="2*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="100px" />
+                        <RowDefinition Height="2*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- left top selection -->
+                    <StackPanel
+                        Grid.Column="0" Grid.Row="0">
+                        <ComboBox
+                            Width="300px"
+                            Height="25px"
+                            Margin="0px 75px 0px 0px"
+                            ItemsSource="{Binding ParentItemsLeft}"
+                            SelectedItem="{Binding SelectedParentItemLeft}"
+                            DisplayMemberPath="DisplayTitle"
+                            IsEditable="True"
+                            IsTextSearchEnabled="True"
+                            TextSearch.TextPath="DisplayTitle" />
+                    </StackPanel>
+
+                    <!-- left down selection -->
+                    <StackPanel
+                        Grid.Column="0" Grid.Row="1"
+                        Grid.RowSpan="2">
+                        <ListBox
+                            Width="300px"
+                            Height="475px"
+                            Margin="0px 25px 0px 0px"
+                            SelectionMode="Single"
+                            ItemsSource="{Binding ItemsLeft}"
+                            SelectedItem="{Binding SelectedItemLeft}">
+
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border
+                                        Padding="5"
+                                        Background="Transparent">
+
+                                        <Border.InputBindings>
+                                            <MouseBinding
+                                                MouseAction="LeftDoubleClick"
+                                                Command="{Binding DataContext.OpenLeftParentFromItemCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                                CommandParameter="{Binding}" />
+                                        </Border.InputBindings>
+
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock
+                                                Width="45"
+                                                Opacity="0.65"
+                                                Text="{Binding NodeType}" />
+
+                                            <TextBlock
+                                                Text="{Binding Title}"
+                                                TextTrimming="CharacterEllipsis" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+
+                    <!-- middle panel -->
+                    <DockPanel
+                        Grid.Column="1" Grid.Row="0"
+                        Grid.RowSpan="3"
+                        Background="{StaticResource BaseColor2}">
+                        <Border
+                            BorderThickness="5px 5px 5px 0px"
+                            BorderBrush="{StaticResource BaseColor3}">
+                            <StackPanel>
+                                
+                                <!-- buttons -->
+                                <StackPanel
+                                        Grid.Column="1" Grid.Row="1">
+
+                                    <!-- move left/right -->
+                                    <Border
+                                            Margin="0px 125px 0px 0px"
+                                            Padding="0px 5px"
+                                            BorderThickness="0px 5px"
+                                            BorderBrush="{StaticResource BaseColor3}">
+                                        <StackPanel>
+                                            <!-- move right -->
+                                            <Button
+                                                Command="{Binding MoveRightCommand}"
+                                                Margin="5px 0px"
+                                                Padding="0px">
+                                                <Image
+                                                    Width="20px"
+                                                    Source="/Resources/Icons/arrow_right.png" />
+                                            </Button>
+
+                                            <!-- move left -->
+                                            <Button
+                                                Command="{Binding MoveLeftCommand}"
+                                                Margin="5px 10px 5px 0px"
+                                                Padding="0px">
+                                                <Image
+                                                    Width="20px"
+                                                    Source="/Resources/Icons/arrow_left.png" />
+                                            </Button>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- new group buttons -->
+                                    <Border
+                                        Padding="5px"
+                                        Margin="0px 25px 0px 0px"
+                                        BorderThickness="0px 5px"
+                                        BorderBrush="{StaticResource BaseColor3}">
+                                        <StackPanel>
+                                            <Label
+                                                HorizontalContentAlignment="Center"
+                                                FontSize="14"
+                                                Content="Create new group" />
+                                            <TextBox
+                                                Margin="0px 5px 0px 0px"
+                                                Padding="5px"
+                                                TextWrapping="NoWrap"
+                                                FontSize="12"
+                                                Text="{Binding NewGroupTitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                            
+                                            <!-- buttons -->
+                                            <Grid
+                                                Margin="0px 10px 0px 0px">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- new group left -->
+                                                <Button
+                                                    Grid.Column="0"
+                                                    Command="{Binding CreateGroupLeftCommand}"
+                                                    Margin="0px 0px 5px 0px"
+                                                    Padding="0px">
+                                                    <Image
+                                                        Width="20px"
+                                                        Source="/Resources/Icons/arrow_left.png" />
+                                                </Button>
+
+                                                <!-- new group right -->
+                                                <Button
+                                                    Grid.Column="1"
+                                                    Command="{Binding CreateGroupRightCommand}"
+                                                    Margin="5px 0px 0px 0px"
+                                                    Padding="0px">
+                                                    <Image
+                                                        Width="20px"
+                                                        Source="/Resources/Icons/arrow_right.png" />
+                                                </Button>
+                                            </Grid>
+
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+
+                                <!-- item info -->
+                                <Border
+                                    Margin="0px 25px 0px 0px"
+                                    Padding="5px"
+                                    BorderThickness="0px 5px"
+                                    BorderBrush="{StaticResource BaseColor3}">
+                                    <StackPanel>
+                                        <Label
+                                            HorizontalContentAlignment="Center"
+                                            FontSize="14"
+                                            Content="Selected item info" />
+                                        
+                                        <!-- title -->
+                                        <TextBlock
+                                            Margin="2px 5px"
+                                            FontSize="12"
+                                            Opacity="0.65"
+                                            TextAlignment="Center"
+                                            TextWrapping="WrapWithOverflow"
+                                            d:Text="Title / Select item"
+                                            Text="{Binding SelectedItem.Title}" />
+
+                                        <!-- type -->
+                                        <StackPanel
+                                            Orientation="Horizontal">
+                                            <Label
+                                                HorizontalContentAlignment="Left"
+                                                Width="60px"
+                                                FontSize="12"
+                                                Content="Type: " />
+                                            <Label
+                                                HorizontalContentAlignment="Left"
+                                                Opacity="0.65"
+                                                FontSize="12"
+                                                Content="{Binding SelectedItem.NodeType}" />
+                                        </StackPanel>
+
+                                        <!-- id -->
+                                        <StackPanel
+                                            Orientation="Horizontal">
+                                            <Label
+                                                HorizontalContentAlignment="Left"
+                                                Width="60px"
+                                                FontSize="12"
+                                                Content="Id: " />
+                                            <Label
+                                                HorizontalContentAlignment="Left"
+                                                Opacity="0.65"
+                                                FontSize="12"
+                                                d:Content="12345 / Select item"
+                                                Content="{Binding SelectedItem.Id}" />
+                                        </StackPanel>
+
+                                        <!-- parent id -->
+                                        <StackPanel
+                                            Orientation="Horizontal">
+                                            <Label
+                                                HorizontalContentAlignment="Left"
+                                                Width="60px"
+                                                FontSize="12"
+                                                Content="Parent Id: " />
+                                            <Label
+                                                HorizontalContentAlignment="Left"
+                                                Opacity="0.65"
+                                                FontSize="12"
+                                                d:Content="12345 / No parent / Select item" 
+                                                Content="{Binding SelectedItem.ParentNodeId}"/>
+                                        </StackPanel>
+
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                    </DockPanel>
+
+                    <!-- right top selection -->
+                    <StackPanel
+                        Grid.Column="2" Grid.Row="0">
+                        <ComboBox
+                            Width="300px"
+                            Height="25px"
+                            Margin="0px 75px 0px 0px"
+                            ItemsSource="{Binding ParentItemsRight}"
+                            SelectedItem="{Binding SelectedParentItemRight}"
+                            DisplayMemberPath="DisplayTitle"
+                            IsEditable="True"
+                            IsTextSearchEnabled="True"
+                            TextSearch.TextPath="DisplayTitle" />
+                    </StackPanel>
+
+                    <!-- right down selection -->
+                    <StackPanel
+                        Grid.Column="2" Grid.Row="1"
+                        Grid.RowSpan="2">
+                        <ListBox
+                            Width="300px"
+                            Height="475px"
+                            Margin="0px 25px 0px 0px"
+                            SelectionMode="Single"
+                            ItemsSource="{Binding ItemsRight}"
+                            SelectedItem="{Binding SelectedItemRight}">
+
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border
+                                        Padding="5"
+                                        Background="Transparent">
+
+                                        <Border.InputBindings>
+                                            <MouseBinding
+                                                MouseAction="LeftDoubleClick"
+                                                Command="{Binding DataContext.OpenRightParentFromItemCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                                CommandParameter="{Binding}" />
+                                        </Border.InputBindings>
+
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock
+                                                Width="45"
+                                                Opacity="0.65"
+                                                Text="{Binding NodeType}" />
+
+                                            <TextBlock
+                                                Text="{Binding Title}"
+                                                TextTrimming="CharacterEllipsis" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Tags" >
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="2*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="100px" />
+                        <RowDefinition Height="2*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- left tag top search -->
+                    <StackPanel
+                        Grid.Column="0" Grid.Row="0">
+                        <TextBox
+                            Width="300px"
+                            Height="25px"
+                            VerticalContentAlignment="Center"
+                            Margin="0px 75px 0px 0px"
+                            Padding="5px 0px"
+                            Text="{Binding TagSearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+
+                    <!-- left tag down selection -->
+                    <StackPanel
+                        Grid.Column="0" Grid.Row="1"
+                        Grid.RowSpan="2">
+                        <ListBox
+                            Width="300px"
+                            Height="475px"
+                            Margin="0px 25px 0px 0px"
+                            SelectionMode="Single"
+                            ItemsSource="{Binding TagsView}"
+                            SelectedItem="{Binding SelectedTag}">
+
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border
+                                        Padding="5"
+                                        Background="Transparent">
+
+                                        <StackPanel Orientation="Horizontal">
+                                            
+                                            <!-- name -->
+                                            <TextBlock
+                                                Text="{Binding Name}"
+                                                TextTrimming="CharacterEllipsis" />
+                                            
+                                            <!-- background color -->
+                                            <Border
+                                                Width="15px"
+                                                Height="15px"
+                                                Margin="10px 0px 0px 0px"
+                                                Background="{Binding BackgroundColorHex}" />
+
+                                            <!-- foreground color -->
+                                            <Border
+                                                Width="15px"
+                                                Height="15px"
+                                                Margin="10px 0px 0px 0px"
+                                                Background="{Binding ForegroundColorHex}" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+
+                    <!-- middle panel -->
+                    <DockPanel
+                        Grid.Column="1" Grid.Row="0"
+                        Grid.RowSpan="3"
+                        Background="{StaticResource BaseColor2}">
+                        <Border
+                            BorderThickness="5px 5px 5px 0px"
+                            BorderBrush="{StaticResource BaseColor3}">
+                            <StackPanel>
+                                
+                                <!-- item info -->
+                                <Border
+                                    Margin="0px 25px 0px 0px"
+                                    Padding="5px"
+                                    BorderThickness="0px 5px"
+                                    BorderBrush="{StaticResource BaseColor3}">
+                                    <StackPanel>
+                                        <Label
+                                            HorizontalContentAlignment="Center"
+                                            FontSize="14"
+                                            Content="Selected item info" />
+                        
+                                        <!-- title -->
+                                        <TextBlock
+                                            Margin="2px 5px"
+                                            FontSize="12"
+                                            Opacity="0.65"
+                                            TextAlignment="Center"
+                                            TextWrapping="WrapWithOverflow"
+                                            d:Text="Title / Select item"
+                                            Text="{Binding SelectedItem.Title}" />
+
+                                        <!-- type -->
+                                        <StackPanel
+                                            Orientation="Horizontal">
+                                            <Label
+                                                HorizontalContentAlignment="Left"
+                                                Width="60px"
+                                                FontSize="12"
+                                                Content="Type: " />
+                                            <Label
+                                                HorizontalContentAlignment="Left"
+                                                Opacity="0.65"
+                                                FontSize="12"
+                                                d:Content="Group / File"
+                                                Content="{Binding SelectedItem.NodeType}" />
+                                        </StackPanel>
+
+                                        <!-- id -->
+                                        <StackPanel
+                                            Orientation="Horizontal">
+                                            <Label
+                                                HorizontalContentAlignment="Left"
+                                                Width="60px"
+                                                FontSize="12"
+                                                Content="Id: " />
+                                            <Label
+                                                HorizontalContentAlignment="Left"
+                                                Opacity="0.65"
+                                                FontSize="12"
+                                                d:Content="12345 / Select item"
+                                                Content="{Binding SelectedItem.Id}" />
+                                        </StackPanel>
+
+                                        <!-- parent id -->
+                                        <StackPanel
+                                            Orientation="Horizontal">
+                                            <Label
+                                                HorizontalContentAlignment="Left"
+                                                Width="60px"
+                                                FontSize="12"
+                                                Content="Parent Id: " />
+                                            <Label
+                                                HorizontalContentAlignment="Left"
+                                                Opacity="0.65"
+                                                FontSize="12"
+                                                d:Content="12345 / No parent / Select item" 
+                                                Content="{Binding SelectedItem.ParentNodeId}"/>
+                                        </StackPanel>
+
+                                    </StackPanel>
+                                </Border>
+                
+                                <!-- tag info -->
+                                <Border
+                                    Margin="0px 25px 0px 0px"
+                                    Padding="5px"
+                                    BorderThickness="0px 5px"
+                                    BorderBrush="{StaticResource BaseColor3}">
+                                    <StackPanel>
+                                        <Label
+                                            HorizontalContentAlignment="Center"
+                                            FontSize="14"
+                                            Content="Selected tag info" />
+
+                                        <!-- name -->
+                                        <TextBlock
+                                            Margin="2px 5px"
+                                            FontSize="12"
+                                            Opacity="0.65"
+                                            TextAlignment="Center"
+                                            TextWrapping="WrapWithOverflow"
+                                            d:Text="Name / Select tag"
+                                            Text="{Binding SelectedTag.Name}" />
+
+                                        <!-- id -->
+                                        <StackPanel
+                                            Orientation="Horizontal">
+                                            <Label
+                                                HorizontalContentAlignment="Left"
+                                                Width="60px"
+                                                FontSize="12"
+                                                Content="Id: " />
+                                            <Label
+                                                HorizontalContentAlignment="Left"
+                                                Opacity="0.65"
+                                                FontSize="12"
+                                                d:Content="12345 / Select tag"
+                                                Content="{Binding SelectedTag.Id}" />
+                                        </StackPanel>
+
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- buttons -->
+                                <StackPanel
+                                    Grid.Column="1" Grid.Row="1">
+
+                                    <!-- new tag button -->
+                                    <Border
+                                        Padding="5px"
+                                        Margin="0px 25px 0px 0px"
+                                        BorderThickness="0px 5px"
+                                        BorderBrush="{StaticResource BaseColor3}">
+                                        <StackPanel>
+                                            <Label
+                                                HorizontalContentAlignment="Center"
+                                                FontSize="14"
+                                                Content="Create new tag" />
+                                            <TextBox
+                                                Margin="0px 5px 0px 0px"
+                                                Padding="5px"
+                                                TextWrapping="NoWrap"
+                                                FontSize="12"
+                                                Text="{Binding NewTagName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                                            <!-- button -->
+                                            <Button
+                                                Grid.Column="0"
+                                                Command="{Binding CreateTagCommand}"
+                                                Margin="0px 10px 0px 0px"
+                                                Padding="0px">
+                                                <Image
+                                                    Width="20px"
+                                                    Source="/Resources/Icons/arrow_left.png" />
+                                            </Button>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- apply/remove tag -->
+                                    <Border
+                                        Margin="0px 25px 0px 0px"
+                                        Padding="0px 5px"
+                                        BorderThickness="0px 5px"
+                                        BorderBrush="{StaticResource BaseColor3}">
+                                        
+                                        <StackPanel>
+                                            <!-- apply -->
+                                            <Button
+                                                Command="{Binding ApplyTagCommand}"
+                                                Margin="5px 0px"
+                                                Padding="0px">
+                                                <Image
+                                                    Width="20px"
+                                                    Source="/Resources/Icons/arrow_right.png" />
+                                            </Button>
+
+                                            <!-- remove -->
+                                            <Button
+                                                Command="{Binding RemoveTagCommand}"
+                                                Margin="5px 10px 5px 0px"
+                                                Padding="0px">
+                                                <Image
+                                                    Width="20px"
+                                                    Source="/Resources/Icons/arrow_left.png" />
+                                            </Button>
+                                        </StackPanel>
+                                    </Border>
+
+                                </StackPanel>
+
+                            </StackPanel>
+                        </Border>
+                    </DockPanel>
+
+                    <!-- right top group selection -->
+                    <StackPanel
+                        Grid.Column="2" Grid.Row="0">
+                        <ComboBox
+                            Width="300px"
+                            Height="25px"
+                            Margin="0px 75px 0px 0px"
+                            ItemsSource="{Binding ParentItemsRight}"
+                            SelectedItem="{Binding SelectedParentItemRight}"
+                            DisplayMemberPath="DisplayTitle"
+                            IsEditable="True"
+                            IsTextSearchEnabled="True"
+                            TextSearch.TextPath="DisplayTitle" />
+                    </StackPanel>
+
+                    <!-- right middle node selection -->
+                    <StackPanel
+                        Grid.Column="2" Grid.Row="1"
+                        Grid.RowSpan="2">
+                        <ListBox
+                            Width="300px"
+                            Height="250px"
+                            Margin="0px 25px 0px 0px"
+                            SelectionMode="Single"
+                            ItemsSource="{Binding ItemsRight}"
+                            SelectedItem="{Binding SelectedItemRight}">
+
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border
+                                        Padding="5"
+                                        Background="Transparent">
+
+                                        <Border.InputBindings>
+                                            <MouseBinding
+                                                MouseAction="LeftDoubleClick"
+                                                Command="{Binding DataContext.OpenRightParentFromItemCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                                CommandParameter="{Binding}" />
+                                        </Border.InputBindings>
+
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock
+                                                Width="45"
+                                                Opacity="0.65"
+                                                Text="{Binding NodeType}" />
+
+                                            <TextBlock
+                                                Text="{Binding Title}"
+                                                TextTrimming="CharacterEllipsis" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+
+                    <!-- right down node tags selection -->
+                    <StackPanel
+                        Grid.Column="2" Grid.Row="1"
+                        Grid.RowSpan="2">
+                        <ListBox
+                            Width="300px"
+                            Height="200px"
+                            Margin="0px 300px 0px 0px"
+                            SelectionMode="Single"
+                            ItemsSource="{Binding SelectedItemTags}"
+                            SelectedItem="{Binding SelectedItemTag}">
+
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border
+                                        Padding="5"
+                                        Background="Transparent">
+
+                                        <StackPanel Orientation="Horizontal">
+                                            
+                                            <!-- name -->
+                                            <TextBlock
+                                                Text="{Binding Name}"
+                                                TextTrimming="CharacterEllipsis" />
+                                            
+                                            <!-- colors -->
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Aliases" >
+
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

@@ -71,10 +71,12 @@ namespace FMVideoManagerApi.Controllers
             if (string.IsNullOrWhiteSpace(request.Password))
                 return BadRequest("Password is required.");
 
-            AppUser? user = await _userRepository.FindByLoginAsync(request.Login.Trim());
+            string login = request.Login.Trim().ToLowerInvariant();
+
+            AppUser? user = await _userRepository.FindByLoginAsync(login);
 
             if (user == null)
-                return Unauthorized("Invalid login or password.");
+                return Unauthorized("User not found.");
 
             bool passwordValid = CryptographyService.VerifyPasswordHash(request.Password, user.PasswordHash);
 

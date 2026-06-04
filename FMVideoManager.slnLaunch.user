@@ -1,0 +1,45 @@
+[
+  {
+    "Name": "App | Debug Api",
+    "Projects": [
+      {
+        "Path": "FMVideoManagerApi\\FMVideoManagerApi.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "FMVideoManagerApp\\FMVideoManagerApp.csproj",
+        "Action": "StartWithoutDebugging"
+      }
+    ]
+  },
+  {
+    "Name": "Debug App | Debug Api",
+    "Projects": [
+      {
+        "Path": "FMVideoManagerApi\\FMVideoManagerApi.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      },
+      {
+        "Path": "FMVideoManagerApp\\FMVideoManagerApp.csproj",
+        "Action": "Start",
+        "DebugTarget": "FMVideoManagerApp"
+      }
+    ]
+  },
+  {
+    "Name": "Debug App | Api",
+    "Projects": [
+      {
+        "Path": "FMVideoManagerApi\\FMVideoManagerApi.csproj",
+        "Action": "StartWithoutDebugging",
+        "DebugTarget": "https"
+      },
+      {
+        "Path": "FMVideoManagerApp\\FMVideoManagerApp.csproj",
+        "Action": "Start",
+        "DebugTarget": "FMVideoManagerApp"
+      }
+    ]
+  }
+]

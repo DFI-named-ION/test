@@ -5,7 +5,8 @@
              xmlns:viewModels="clr-namespace:FMVideoManagerApp.ViewModels"
              xmlns:logInComponent="clr-namespace:FMVideoManagerApp.Components.LogInComponent"
              xmlns:fileListComponent="clr-namespace:FMVideoManagerApp.Components.FileListComponent"
-             xmlns:settingsComponent="clr-namespace:FMVideoManagerApp.Components.SettingsComponent">
+             xmlns:settingsComponent="clr-namespace:FMVideoManagerApp.Components.SettingsComponent"
+             xmlns:hierarchyRelationsComponent="clr-namespace:FMVideoManagerApp.Components.HierarchyRelationsComponent">
     <Application.Resources>
         <SolidColorBrush x:Key="WhiteSmoke" Color="#D9D9D9" />
         <SolidColorBrush x:Key="DarkerWhiteSmoke" Color="#C9C9C9" />
@@ -23,6 +24,9 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type viewModels:SettingsViewModel}">
             <settingsComponent:SettingsComponent/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:HierarchyRelationsViewModel}">
+            <hierarchyRelationsComponent:HierarchyRelationsComponent/>
         </DataTemplate>
     </Application.Resources>
 </Application>

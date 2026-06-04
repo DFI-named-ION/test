@@ -1,8 +1,9 @@
 ﻿using FMVideoManagerApp.Core;
-using FMVideoManagerApp.Data.Repositories.FileRepository;
-using FMVideoManagerApp.Models;
+using FMVideoManagerApp.Data.DTO;
 using FMVideoManagerApp.Services;
+using FMVideoManagerApp.ViewModels.Items;
 using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Input;
 
 namespace FMVideoManagerApp.ViewModels
@@ -10,26 +11,17 @@ namespace FMVideoManagerApp.ViewModels
     public sealed class FileListViewModel : ObservableObject, IComponentViewModel
     {
         private readonly MessageService _messageService;
-        private readonly AuthService _authService;
+        private readonly ApiClient _apiClient;
+        private readonly TagService _tagService;
         private readonly FileIndexingService _fileIndexingService;
-        private readonly IFileRepository _fileRepo;
+        private readonly HierarchyService _hierarchyService;
 
-        private ObservableCollection<FileItem> _hierarchyEntries;
-        public ObservableCollection<FileItem> HierarchyEntries
-        {
-            get => _hierarchyEntries;
-            set
-            {
-                if (_hierarchyEntries != value)
-                {
-                    _hierarchyEntries = value;
-                    OnPropertyChanged(nameof(HierarchyEntries));
-                }
-            }
-        }
+        public FileLibraryService Library { get; }
+        public HierarchyService Hierarchy => _hierarchyService;
+        public FileIndexingState Indexing => _fileIndexingService.State;
 
-        private FileItem _selectedEntry;
-        public FileItem SelectedEntry
+        private HierarchyItemViewModel? _selectedEntry;
+        public HierarchyItemViewModel? SelectedEntry
         {
             get => _selectedEntry;
             set
@@ -38,6 +30,9 @@ namespace FMVideoManagerApp.ViewModels
                 {
                     _selectedEntry = value;
                     OnPropertyChanged(nameof(SelectedEntry));
+
+                    _ = RefreshSelectedItemTagsAsync();
+                    _ = LoadSelectedFileReferencesAsync();
                 }
             }
         }
@@ -57,7 +52,6 @@ namespace FMVideoManagerApp.ViewModels
                     OnPropertyChanged(nameof(ImageWidth));
                     OnPropertyChanged(nameof(ImageHeight));
                     OnPropertyChanged(nameof(CardFontSize));
-                    OnPropertyChanged(nameof(TextMaxHeight));
                 }
             }
         }
@@ -117,62 +111,308 @@ namespace FMVideoManagerApp.ViewModels
             _ => 10
         };
 
-        public double TextMaxHeight => ColumnsCount switch
+        public ObservableCollection<HierarchyItemViewModel> Breadcrumbs => _hierarchyService.Breadcrumbs;
+
+        public ObservableCollection<TagItemViewModel> SelectedItemTags => _tagService.SelectedNodeTags;
+
+        public string SelectedItemTagsHeader => $"Tags ({SelectedItemTags.Count}):";
+
+        private ObservableCollection<StorageReferenceItemViewModel> _selectedFileReferences = new();
+        public ObservableCollection<StorageReferenceItemViewModel> SelectedFileReferences
         {
-            1 => 110,
-            2 => 90,
-            3 => 75,
-            4 => 65,
-            5 => 60,
-            6 => 55,
-            _ => 55
-        };
+            get => _selectedFileReferences;
+            private set
+            {
+                if (_selectedFileReferences != value)
+                {
+                    _selectedFileReferences = value;
+                    OnPropertyChanged(nameof(SelectedFileReferences));
+                    OnPropertyChanged(nameof(SelectedFileReferencesHeader));
+                }
+            }
+        }
 
-        public ICommand StartIndexingCommand { get; }
+        public string SelectedFileReferencesHeader => $"References: ({SelectedFileReferences.Count})";
+
         public ICommand SelectEntryCommand { get; }
+        public ICommand OpenHierarchyItemCommand { get; }
+        public ICommand GoUpCommand { get; }
+        public ICommand OpenRootCommand { get; }
+        public ICommand OpenBreadcrumbCommand { get; }
+        public ICommand DeleteSelectedNodeCommand { get; }
+        public ICommand SaveSelectedNodeTitleCommand { get; }
+        public ICommand SaveSelectedNodeDescriptionCommand { get; }
+        public ICommand SaveSelectedNodeNotesCommand { get; }
 
-        public FileListViewModel(MessageService messageService, AuthService authService, FileIndexingService fileIndexingService, IFileRepository fileRepo)
+        public ICommand StartLocalIndexingCommand { get; }
+        public ICommand CancelLocalIndexingCommand { get; }
+        public ICommand SyncPendingLocalFilesCommand { get; }
+        public ICommand StartCloudIndexingCommand { get; }
+
+        public FileListViewModel(MessageService messageService, ApiClient apiClient, FileIndexingService fileIndexingService, FileLibraryService library,
+            HierarchyService hierarchyService, TagService tagService)
         {
             _messageService = messageService;
-            _authService = authService;
-            _authService.OnLogIn += FetchUserFiles;
+            _apiClient = apiClient;
             _fileIndexingService = fileIndexingService;
-            _fileRepo = fileRepo;
+            Library = library;
+            _hierarchyService = hierarchyService;
+            _tagService = tagService;
 
-            _hierarchyEntries= new ObservableCollection<FileItem>();
-            _selectedEntry = new FileItem()
-            {
-                OriginalFilename = "Select media",
-                Path = "Select media",
-                Notes = "Select media"
-            };
+            StartLocalIndexingCommand = new RelayCommand(async _ => await StartLocalIndexingAsync());
+            CancelLocalIndexingCommand = new RelayCommand(_ => CancelLocalIndexing());
+            SyncPendingLocalFilesCommand = new RelayCommand(async _ => await SyncPendingFilesAsync());
+            StartCloudIndexingCommand = new RelayCommand(async _ => await StartCloudIndexingAsync());
 
-            StartIndexingCommand = new RelayCommand(x =>
+            SelectEntryCommand = new RelayCommand(item =>
             {
-                try
-                {
-                    _fileIndexingService.StartIndexing();
-                    FetchUserFiles();
-                }
-                catch (Exception ex)
-                {
-                    _messageService.ShowError("Error happened during file indexing...");
-                }
+                if (item is not HierarchyItemViewModel hierarchyItem)
+                    return;
+
+                SelectedEntry = hierarchyItem;
             });
-            SelectEntryCommand = new RelayCommand(entry =>
+
+
+            // HIERARCHY
             {
-                SelectedEntry = (FileItem)entry;
-            });
+                OpenHierarchyItemCommand = new RelayCommand(entry =>
+                {
+                    if (entry is not HierarchyItemViewModel item)
+                        return;
+
+                    if (item.IsGroup)
+                    {
+                        _hierarchyService.OpenFolder(item.Id);
+                        SelectedEntry = null;
+                        return;
+                    }
+
+                    SelectedEntry = item;
+                });
+                GoUpCommand = new RelayCommand(_ =>
+                {
+                    _hierarchyService.GoUp();
+                    SelectedEntry = null;
+                });
+                OpenRootCommand = new RelayCommand(_ =>
+                {
+                    _hierarchyService.OpenRoot();
+                    SelectedEntry = null;
+                });
+                OpenBreadcrumbCommand = new RelayCommand(item =>
+                {
+                    if (item is not HierarchyItemViewModel hierarchyItem)
+                        return;
+
+                    _hierarchyService.OpenFolder(hierarchyItem.Id);
+                });
+
+                DeleteSelectedNodeCommand = new RelayCommand(async _ => await DeleteSelectedNodeAsync());
+                SaveSelectedNodeTitleCommand = new RelayCommand(async _ => await SaveSelectedNodeTitleAsync());
+                SaveSelectedNodeDescriptionCommand = new RelayCommand(async _ => await SaveSelectedNodeDescriptionAsync());
+                SaveSelectedNodeNotesCommand = new RelayCommand(async _ => await SaveSelectedNodeNotesAsync());
+            }
+
         }
 
-        public void AssingColumnsCount(int columnsCount)
+        public void AssingColumnsCount(int count)
         {
-            ColumnsCount = columnsCount;
+            ColumnsCount = count;
         }
 
-        public void FetchUserFiles()
+        private async Task LoadSelectedFileReferencesAsync()
         {
-            HierarchyEntries = new ObservableCollection<FileItem>(_fileRepo.GetByUserId(_authService.GetUser().Id));
+            try
+            {
+                if (SelectedEntry == null || !SelectedEntry.IsFile)
+                {
+                    SelectedFileReferences.Clear();
+                    OnPropertyChanged(nameof(SelectedFileReferencesHeader));
+                    return;
+                }
+
+                List<StorageReferenceDto> references = await _apiClient.GetFileReferencesAsync(SelectedEntry.Id);
+
+                SelectedFileReferences = new ObservableCollection<StorageReferenceItemViewModel>(references.Select(x => new StorageReferenceItemViewModel(x)));
+            }
+            catch (Exception ex)
+            {
+                SelectedFileReferences.Clear();
+                OnPropertyChanged(nameof(SelectedFileReferencesHeader));
+
+                _messageService.ShowError($"Failed to load file references: {ex.Message}");
+            }
+        }
+
+        private async Task StartLocalIndexingAsync()
+        {
+            try
+            {
+                _messageService.ShowMessage("Local indexing has started.");
+
+                await _fileIndexingService.StartIndexingAsync();
+
+                await RefreshAfterIndexingAsync();
+
+                _messageService.ShowMessage("Local indexing finished.");
+            }
+            catch (Exception ex)
+            {
+                _messageService.ShowError($"Error happened during local indexing: {ex.Message}");
+            }
+        }
+
+        private void CancelLocalIndexing()
+        {
+            _fileIndexingService.CancelIndexing();
+            _messageService.ShowMessage("Local indexing canceled.");
+        }
+
+        private async Task SyncPendingFilesAsync()
+        {
+            try
+            {
+                await _fileIndexingService.SyncPendingFilesAsync();
+
+                await RefreshAfterIndexingAsync();
+
+                _messageService.ShowMessage("Pending local sync finished.");
+            }
+            catch (Exception ex)
+            {
+                _messageService.ShowError($"Error happened during local sync: {ex.Message}");
+            }
+        }
+
+        private async Task StartCloudIndexingAsync() // move, fix
+        {
+            try
+            {
+                List<CloudProviderAccountDto> accounts = await _apiClient.GetCloudAccountsAsync();
+
+                List<CloudProviderAccountDto> activeDropboxAccounts = accounts
+                    .Where(x =>
+                        x.Provider == CloudProviderType.Dropbox &&
+                        x.IsActive)
+                    .ToList();
+
+                if (activeDropboxAccounts.Count == 0)
+                {
+                    _messageService.ShowWarning("No active Dropbox accounts connected.");
+                    return;
+                }
+
+                foreach (CloudProviderAccountDto account in activeDropboxAccounts)
+                {
+                    _messageService.ShowMessage($"Cloud indexing for {account.DisplayName ?? account.Email} has started.");
+
+                    await _apiClient.IndexDropboxAccountAsync(account.Id);
+                }
+
+                await RefreshAfterIndexingAsync();
+
+                _messageService.ShowMessage("Cloud indexing finished.");
+            }
+            catch (Exception ex)
+            {
+                _messageService.ShowError($"Error happened during cloud indexing: {ex.Message}");
+            }
+        }
+
+        private async Task RefreshAfterIndexingAsync()
+        {
+            await Library.RefreshAsync();
+            await _hierarchyService.RefreshAsync();
+        }
+
+        private async Task DeleteSelectedNodeAsync()
+        {
+            try
+            {
+                await _hierarchyService.DeleteNodeAsync(SelectedEntry.Id);
+
+                _messageService.ShowMessage($"{(SelectedEntry.IsFile ? "File" : $"Group")} \"{SelectedEntry.Title}\" removed.");
+                SelectedEntry = null;
+            }
+            catch (Exception ex)
+            {
+                _messageService.ShowError($"Error happened during group removal: {ex.Message}");
+            }
+        }
+
+        private async Task SaveSelectedNodeTitleAsync()
+        {
+            if (SelectedEntry == null)
+                return;
+
+            try
+            {
+                await _hierarchyService.RenameNodeAsync(SelectedEntry.Id, SelectedEntry.EditableTitle);
+                SelectedEntry = null;
+                _messageService.ShowMessage("Title saved.");
+            }
+            catch (Exception ex)
+            {
+                _messageService.ShowError(ex.Message);
+            }
+        }
+
+        private async Task SaveSelectedNodeDescriptionAsync()
+        {
+            if (SelectedEntry == null)
+                return;
+
+            try
+            {
+                await _hierarchyService.UpdateNodeDescriptionAsync(SelectedEntry.Id, SelectedEntry.EditableDescription);
+                SelectedEntry = null;
+                _messageService.ShowMessage("Description saved.");
+            }
+            catch (Exception ex)
+            {
+                _messageService.ShowError(ex.Message);
+            }
+        }
+
+        private async Task SaveSelectedNodeNotesAsync()
+        {
+            if (SelectedEntry == null)
+                return;
+
+            try
+            {
+                await _hierarchyService.UpdateNodeNotesAsync(SelectedEntry.Id, SelectedEntry.EditableNotes);
+                SelectedEntry = null;
+                _messageService.ShowMessage("Notes saved.");
+            }
+            catch (Exception ex)
+            {
+                _messageService.ShowError(ex.Message);
+            }
+        }
+
+        private async Task RefreshSelectedItemTagsAsync()
+        {
+            try
+            {
+                if (SelectedEntry == null)
+                {
+                    _tagService.ClearSelectedNodeTags();
+                    OnPropertyChanged(nameof(SelectedItemTagsHeader));
+                    return;
+                }
+
+                await _tagService.RefreshNodeTagsAsync(SelectedEntry.Id);
+
+                OnPropertyChanged(nameof(SelectedItemTagsHeader));
+            }
+            catch (Exception ex)
+            {
+                _tagService.ClearSelectedNodeTags();
+                OnPropertyChanged(nameof(SelectedItemTagsHeader));
+
+                _messageService.ShowError($"Failed to load tags: {ex.Message}");
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using FMVideoManagerApp.Models.Local;
+﻿using FMVideoManagerApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -158,6 +158,18 @@ namespace FMVideoManagerApp.Data
                 entity.Property(x => x.ExistsOnDisk)
                     .HasColumnName("exists_on_disk")
                     .HasDefaultValue(true);
+
+                entity.Property(x => x.SyncState)
+                    .HasColumnName("sync_state")
+                    .HasConversion<int>()
+                    .IsRequired();
+
+                entity.Property(x => x.LastSyncedAtUtc)
+                    .HasColumnName("last_synced_at_utc");
+
+                entity.Property(x => x.LastSyncError)
+                    .HasColumnName("last_sync_error");
+
 
                 entity.HasOne(x => x.LocalIndexedPath)
                     .WithMany()

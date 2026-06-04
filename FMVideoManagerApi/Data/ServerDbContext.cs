@@ -581,8 +581,7 @@ namespace FMVideoManagerApi.Data
                     .HasMaxLength(64);
 
                 entity.Property(x => x.CloudProviderAccountId)
-                    .HasColumnName("cloud_provider_account_id")
-                    .IsRequired();
+                    .HasColumnName("cloud_provider_account_id");
 
                 entity.Property(x => x.Provider)
                     .HasColumnName("provider")
@@ -669,7 +668,13 @@ namespace FMVideoManagerApi.Data
 
                 entity.HasIndex(x => new { x.CloudProviderAccountId, x.ProviderItemId })
                     .IsUnique()
-                    .HasDatabaseName("UQ_storage_reference_provider_item");
+                    .HasFilter("cloud_provider_account_id IS NOT NULL")
+                    .HasDatabaseName("UQ_storage_reference_cloud_account_provider_item");
+
+                entity.HasIndex(x => new { x.UserId, x.Provider, x.ProviderItemId })
+                    .IsUnique()
+                    .HasFilter("provider = 'Local'")
+                    .HasDatabaseName("UQ_storage_reference_local_user_provider_item");
 
                 entity.HasIndex(x => new { x.Provider, x.ProviderItemId })
                     .HasDatabaseName("IX_storage_reference_provider_item");

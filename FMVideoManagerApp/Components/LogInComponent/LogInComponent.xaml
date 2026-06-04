@@ -17,11 +17,14 @@
     </UserControl.Resources>
     <StackPanel>
         <TextBox
+        Text="{Binding Alias, Mode=TwoWay}"
+        Margin="0px 125px 0px 0px"/>
+        <TextBox
             Text="{Binding Login, Mode=TwoWay}"
-            Margin="0px 175px 0px 0px"/>
+            Margin="0px 25px 0px 0px"/>
         <TextBox 
             Text="{Binding Password, Mode=TwoWay}"
-            Margin="0px 50px 0px 0px"/>
+            Margin="0px 25px 0px 0px"/>
         <Button Content="Log in" Command="{Binding LogInCommand}"/>
         <Button Content="Register" Command="{Binding RegisterCommand}"/>
     </StackPanel>
