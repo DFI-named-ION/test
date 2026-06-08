@@ -36,6 +36,8 @@ namespace FMVideoManagerApi
             builder.Services.AddScoped<JwtTokenService>();
             builder.Services.AddScoped<DropboxStorageIndexingService>();
 
+            builder.Services.AddSingleton<CloudIndexingJobService>();
+
             builder.Services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>

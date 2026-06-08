@@ -42,6 +42,7 @@ namespace FMVideoManagerApp
             services.AddSingleton<AuthService>();
             services.AddSingleton<LocalIndexedPathService>();
             services.AddSingleton<FileIndexingService>();
+            services.AddSingleton<IndexingManagerService>();
             services.AddSingleton<FileLibraryService>();
             services.AddSingleton<HierarchyService>();
             services.AddSingleton<TagService>();

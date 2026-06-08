@@ -17,7 +17,7 @@
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30px"/>
+            <RowDefinition Height="50px"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -32,45 +32,81 @@
                 <ColumnDefinition Width="450px"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <!--progress-->
+
+            <!-- progress -->
             <StackPanel
                 Grid.Column="0"
                 VerticalAlignment="Center">
+
+                <TextBlock
+                    Margin="5px 0px 5px 0px"
+                    d:Background="White"
+                    FontSize="12"
+                    Opacity="0.75"
+                    TextTrimming="CharacterEllipsis">
+                    <Run Text="{Binding Indexing.FancyStatusMessage, Mode=OneWay}" />
+                </TextBlock>
+
                 <ProgressBar
                     Minimum="0"
                     Maximum="100"
-                    Height="30"
+                    Height="30px"
                     VerticalAlignment="Center"
                     Value="{Binding Indexing.ProgressPercent, Mode=OneWay}"
                     IsIndeterminate="{Binding Indexing.IsIndeterminate, Mode=OneWay}" />
             </StackPanel>
-            <!--files count-->
-            <Grid
+
+            <!-- files count -->
+            <StackPanel
                 Grid.Column="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="3*" />
-                </Grid.ColumnDefinitions>
+                
+                <!-- processed / total -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="3*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label
+                        Grid.Column="0"
+                        VerticalAlignment="Stretch"
+                        VerticalContentAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Right"
+                        d:Background="White"
+                        Content="{Binding Indexing.ProcessedFiles}"/>
+
+                    <Label
+                        Grid.Column="1"
+                        VerticalAlignment="Stretch"
+                        VerticalContentAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        d:Background="White"
+                        Content="/"/>
+
+                    <Label
+                        Grid.Column="2"
+                        VerticalAlignment="Stretch"
+                        VerticalContentAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Left"
+                        d:Background="White"
+                        Content="{Binding Indexing.TotalFiles}"/>
+                </Grid>
+
+                <!-- failed -->
                 <Label
-                    Grid.Column="0"
-                    VerticalAlignment="Stretch" VerticalContentAlignment="Center"
-                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Right"
+                    VerticalAlignment="Stretch"
+                    VerticalContentAlignment="Center"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center"
                     d:Background="White"
-                    Content="{Binding Indexing.ProcessedFiles}"/>
-                <Label
-                    Grid.Column="1"
-                    VerticalAlignment="Stretch" VerticalContentAlignment="Center"
-                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                    d:Background="White"
-                    Content="/"/>
-                <Label
-                    Grid.Column="2"
-                    VerticalAlignment="Stretch" VerticalContentAlignment="Center"
-                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
-                    d:Background="White"
-                    Content="{Binding Indexing.TotalFiles}"/>
-            </Grid>
+                    d:Content="Failed: 000"
+                    Content="{Binding Indexing.FancyFailedFilesText}" />
+            </StackPanel>
+            
         </Grid>
 
         <!-- main layout -->
@@ -487,14 +523,14 @@
                                             Content="Start indexing local files"
                                             Command="{Binding StartLocalIndexingCommand}"/>
                                         <Button
-                                            Content="Cancel indexing local files"
-                                            Command="{Binding CancelLocalIndexingCommand}"/>
-                                        <Button
-                                            Content="Synchronise pending ?local? files?"
-                                            Command="{Binding SyncPendingLocalFilesCommand}"/>
-                                        <Button
                                             Content="Start indexing cloud files"
                                             Command="{Binding StartCloudIndexingCommand}"/>
+                                        <Button
+                                            Content="Cancel indexing"
+                                            Command="{Binding CancelIndexingCommand}"/>
+                                        <Button
+                                            Content="Synchronise pending local files"
+                                            Command="{Binding SyncPendingLocalFilesCommand}"/>
                                     </StackPanel>
                                 </Expander>
                             </StackPanel>

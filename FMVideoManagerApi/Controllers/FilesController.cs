@@ -1,5 +1,6 @@
 ﻿using FMVideoManagerApi.Data;
 using FMVideoManagerApi.Data.DTO;
+using FMVideoManagerApi.Data.DTO.Indexing;
 using FMVideoManagerApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -216,21 +217,24 @@ namespace FMVideoManagerApi.Controllers
             if (!TryGetCurrentUserId(out long userId))
                 return Unauthorized();
 
-            bool fileExists = await _db.FileItems
-                .AnyAsync(
+            FileItem? fileItem = await _db.FileItems
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
                     x =>
                         x.NodeId == fileNodeId &&
                         x.Node.UserId == userId,
                     cancellationToken);
 
-            if (!fileExists)
+            if (fileItem == null)
                 return NotFound("File node not found.");
+
+            string contentHash = fileItem.ContentHash;
 
             List<StorageReferenceDto> references = await _db.StorageReferences
                 .AsNoTracking()
                 .Where(x =>
                     x.UserId == userId &&
-                    x.FileNodeId == fileNodeId)
+                    x.ContentHash == contentHash)
                 .OrderBy(x => x.Provider)
                 .ThenBy(x => x.ProviderPath)
                 .Select(x => new StorageReferenceDto
@@ -249,13 +253,65 @@ namespace FMVideoManagerApi.Controllers
                     ProviderModifiedAtUtc = x.ProviderModifiedAtUtc,
                     LastSeenAtUtc = x.LastSeenAtUtc,
                     State = x.State,
-                    AccountDisplayName = x.CloudProviderAccount.DisplayName,
-                    AccountEmail = x.CloudProviderAccount.Email
+                    AccountDisplayName = x.CloudProviderAccount == null
+                        ? null
+                        : x.CloudProviderAccount.DisplayName,
+                    AccountEmail = x.CloudProviderAccount == null
+                        ? null
+                        : x.CloudProviderAccount.Email
                 })
                 .ToListAsync(cancellationToken);
 
             return Ok(references);
         }
+
+        //[Authorize]
+        //[HttpGet("{fileNodeId:long}/references")]
+        //public async Task<ActionResult<List<StorageReferenceDto>>> GetFileReferences(long fileNodeId, CancellationToken cancellationToken)
+        //{
+        //    if (!TryGetCurrentUserId(out long userId))
+        //        return Unauthorized();
+
+        //    bool fileExists = await _db.FileItems
+        //        .AnyAsync(
+        //            x =>
+        //                x.NodeId == fileNodeId &&
+        //                x.Node.UserId == userId,
+        //            cancellationToken);
+
+        //    if (!fileExists)
+        //        return NotFound("File node not found.");
+
+        //    List<StorageReferenceDto> references = await _db.StorageReferences
+        //        .AsNoTracking()
+        //        .Where(x =>
+        //            x.UserId == userId &&
+        //            x.FileNodeId == fileNodeId)
+        //        .OrderBy(x => x.Provider)
+        //        .ThenBy(x => x.ProviderPath)
+        //        .Select(x => new StorageReferenceDto
+        //        {
+        //            Id = x.Id,
+        //            FileNodeId = x.FileNodeId,
+        //            ContentHash = x.ContentHash,
+        //            CloudProviderAccountId = x.CloudProviderAccountId,
+        //            Provider = x.Provider,
+        //            ProviderItemId = x.ProviderItemId,
+        //            ProviderPath = x.ProviderPath,
+        //            Name = x.Name,
+        //            ProviderRevision = x.ProviderRevision,
+        //            MimeType = x.MimeType,
+        //            SizeBytes = x.SizeBytes,
+        //            ProviderModifiedAtUtc = x.ProviderModifiedAtUtc,
+        //            LastSeenAtUtc = x.LastSeenAtUtc,
+        //            State = x.State,
+        //            AccountDisplayName = x.CloudProviderAccount.DisplayName,
+        //            AccountEmail = x.CloudProviderAccount.Email
+        //        })
+        //        .ToListAsync(cancellationToken);
+
+        //    return Ok(references);
+        //}
 
         private async Task UpsertLocalStorageReferenceAsync(long userId, long fileNodeId, string contentHash, RegisterLocalFileRequest request,
             CancellationToken cancellationToken)

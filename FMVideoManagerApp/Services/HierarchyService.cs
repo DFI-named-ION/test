@@ -191,6 +191,12 @@ namespace FMVideoManagerApp.Services
             RebuildBreadcrumbs();
         }
 
+        public async Task CopyNodeAsync(long nodeId, long? targetParentNodeId, int? sortOrder = null, CancellationToken cancellationToken = default)
+        {
+            await _apiClient.CopyNodeAsync(nodeId, targetParentNodeId, sortOrder, cancellationToken);
+            await RefreshAsync(cancellationToken);
+        }
+
         public async Task DeleteNodeAsync(long nodeId, CancellationToken cancellationToken = default)
         {
             await _apiClient.DeleteNodeAsync(nodeId, cancellationToken);

@@ -1,9 +1,11 @@
 ﻿using FFMpegCore;
 using FMVideoManagerApi.Data;
 using FMVideoManagerApi.Data.DTO.Dropbox;
+using FMVideoManagerApi.Data.DTO.Indexing;
 using FMVideoManagerApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
@@ -25,8 +27,15 @@ namespace FMVideoManagerApi.Services
             _tokenProtector = tokenProtector;
         }
 
-        public async Task<DropboxIndexResult> IndexAsync(CloudProviderAccount account, CancellationToken cancellationToken)
+        public async Task<DropboxIndexResult> IndexAsync(CloudProviderAccount account, IProgress<CloudIndexingProgress>? progress = null,
+            CancellationToken cancellationToken = default)
         {
+            progress?.Report(new CloudIndexingProgress
+            {
+                IsIndeterminate = true,
+                StatusMessage = "Getting Dropbox access token..."
+            });
+
             string accessToken = await GetValidDropboxAccessTokenAsync(account, cancellationToken);
 
             DateTime scanStartedAtUtc = DateTime.UtcNow;
@@ -36,23 +45,54 @@ namespace FMVideoManagerApi.Services
                 CloudProviderAccountId = account.Id
             };
 
+            progress?.Report(new CloudIndexingProgress
+            {
+                IsIndeterminate = true,
+                StatusMessage = "Reading Dropbox file list..."
+            });
+
             List<DropboxFileEntry> files = await GetDropboxFilesAsync(accessToken, cancellationToken);
 
             result.FoundFiles = files.Count;
+
+            int total = files.Count;
+            int processed = 0;
+
+            progress?.Report(new CloudIndexingProgress
+            {
+                IsIndeterminate = false,
+                TotalFiles = total,
+                ProcessedFiles = 0,
+                FailedFiles = 0,
+                DownloadedFiles = 0,
+                IndexedFiles = 0,
+                MarkedMissing = 0,
+                CurrentFileName = null,
+                CurrentFilePath = null,
+                StatusMessage = $"Found {total} Dropbox file(s)."
+            });
 
             foreach (DropboxFileEntry file in files)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
+                progress?.Report(new CloudIndexingProgress
+                {
+                    IsIndeterminate = false,
+                    TotalFiles = total,
+                    ProcessedFiles = processed,
+                    FailedFiles = result.FailedFiles,
+                    DownloadedFiles = result.DownloadedFiles,
+                    IndexedFiles = result.IndexedFiles,
+                    MarkedMissing = result.MarkedMissing,
+                    CurrentFileName = file.Name,
+                    CurrentFilePath = file.PathDisplay,
+                    StatusMessage = $"Indexing Dropbox file: {file.Name}"
+                });
+
                 try
                 {
-                    await IndexDropboxFileAsync(
-                        account,
-                        accessToken,
-                        file,
-                        scanStartedAtUtc,
-                        result,
-                        cancellationToken);
+                    await IndexDropboxFileAsync(account, accessToken, file, scanStartedAtUtc, result, progress, cancellationToken);
                 }
                 catch (OperationCanceledException)
                 {
@@ -64,7 +104,38 @@ namespace FMVideoManagerApi.Services
 
                     await MarkStorageReferenceSyncErrorAsync(account, file, scanStartedAtUtc, ex.Message, cancellationToken);
                 }
+                finally
+                {
+                    processed++;
+
+                    progress?.Report(new CloudIndexingProgress
+                    {
+                        IsIndeterminate = false,
+                        TotalFiles = total,
+                        ProcessedFiles = processed,
+                        FailedFiles = result.FailedFiles,
+                        DownloadedFiles = result.DownloadedFiles,
+                        IndexedFiles = result.IndexedFiles,
+                        MarkedMissing = result.MarkedMissing,
+                        CurrentFileName = file.Name,
+                        CurrentFilePath = file.PathDisplay,
+                        StatusMessage = $"Processed {processed}/{total} Dropbox file(s)."
+                    });
+                }
             }
+
+            progress?.Report(new CloudIndexingProgress
+            {
+                IsIndeterminate = true,
+                TotalFiles = total,
+                ProcessedFiles = processed,
+                FailedFiles = result.FailedFiles,
+                DownloadedFiles = result.DownloadedFiles,
+                IndexedFiles = result.IndexedFiles,
+                CurrentFileName = null,
+                CurrentFilePath = null,
+                StatusMessage = "Marking missing Dropbox references..."
+            });
 
             result.MarkedMissing = await MarkMissingOldReferencesAsync(account, scanStartedAtUtc, cancellationToken);
 
@@ -72,6 +143,22 @@ namespace FMVideoManagerApi.Services
             account.UpdatedAtUtc = DateTime.UtcNow;
 
             await _db.SaveChangesAsync(cancellationToken);
+
+            progress?.Report(new CloudIndexingProgress
+            {
+                IsIndeterminate = false,
+                TotalFiles = total,
+                ProcessedFiles = processed,
+                FailedFiles = result.FailedFiles,
+                DownloadedFiles = result.DownloadedFiles,
+                IndexedFiles = result.IndexedFiles,
+                MarkedMissing = result.MarkedMissing,
+                CurrentFileName = null,
+                CurrentFilePath = null,
+                StatusMessage = result.FailedFiles == 0
+                    ? "Dropbox indexing completed."
+                    : $"Dropbox indexing completed with {result.FailedFiles} failed file(s)."
+            });
 
             return result;
         }
@@ -111,7 +198,7 @@ namespace FMVideoManagerApi.Services
         }
 
         private async Task IndexDropboxFileAsync(CloudProviderAccount account, string accessToken, DropboxFileEntry file, DateTime scanStartedAtUtc,
-            DropboxIndexResult result, CancellationToken cancellationToken)
+            DropboxIndexResult result, IProgress<CloudIndexingProgress>? progress, CancellationToken cancellationToken)
         {
             StorageReference storageReference = await UpsertStorageReferenceAsync(account, file, scanStartedAtUtc, cancellationToken);
 
@@ -119,14 +206,55 @@ namespace FMVideoManagerApi.Services
 
             try
             {
+                progress?.Report(new CloudIndexingProgress
+                {
+                    IsIndeterminate = false,
+                    CurrentFileName = file.Name,
+                    CurrentFilePath = file.PathDisplay,
+                    TotalFiles = result.FoundFiles,
+                    DownloadedFiles = result.DownloadedFiles,
+                    IndexedFiles = result.IndexedFiles,
+                    FailedFiles = result.FailedFiles,
+                    MarkedMissing = result.MarkedMissing,
+                    StatusMessage = $"Downloading {file.Name}..."
+                });
+
                 await DownloadDropboxFileAsync(accessToken, file.Id, tempFilePath, cancellationToken);
 
                 result.DownloadedFiles++;
 
+                progress?.Report(new CloudIndexingProgress
+                {
+                    IsIndeterminate = false,
+                    CurrentFileName = file.Name,
+                    CurrentFilePath = file.PathDisplay,
+                    TotalFiles = result.FoundFiles,
+                    DownloadedFiles = result.DownloadedFiles,
+                    IndexedFiles = result.IndexedFiles,
+                    FailedFiles = result.FailedFiles,
+                    MarkedMissing = result.MarkedMissing,
+                    StatusMessage = $"Hashing {file.Name}..."
+                });
+
                 string sha256 = CryptographyService.HashFile(new FileInfo(tempFilePath));
 
+                progress?.Report(new CloudIndexingProgress
+                {
+                    IsIndeterminate = false,
+                    CurrentFileName = file.Name,
+                    CurrentFilePath = file.PathDisplay,
+                    TotalFiles = result.FoundFiles,
+                    DownloadedFiles = result.DownloadedFiles,
+                    IndexedFiles = result.IndexedFiles,
+                    FailedFiles = result.FailedFiles,
+                    MarkedMissing = result.MarkedMissing,
+                    StatusMessage = $"Reading media info for {file.Name}..."
+                });
+
                 MediaMetadata metadata = await ReadMediaMetadataAsync(tempFilePath);
+
                 FileContent content = await UpsertFileContentAsync(sha256, file, metadata, cancellationToken);
+
                 FileItem fileItem = await CreateOrUpdateFileItemAsync(account, storageReference, file, content, cancellationToken);
 
                 storageReference.ContentHash = content.Hash;
@@ -145,84 +273,10 @@ namespace FMVideoManagerApi.Services
                     if (File.Exists(tempFilePath))
                         File.Delete(tempFilePath);
                 }
-                catch {}
-            }
-        }
-
-        private async Task<StorageReference> UpsertStorageReferenceAsync(CloudProviderAccount account, DropboxFileEntry file, DateTime scanStartedAtUtc,
-            CancellationToken cancellationToken)
-        {
-            string normalizedProviderPath = NormalizeDropboxPath(file.PathLower ?? file.PathDisplay ?? file.Name);
-
-            StorageReference? existing = await _db.StorageReferences
-                .FirstOrDefaultAsync(
-                    x =>
-                        x.CloudProviderAccountId == account.Id &&
-                        x.Provider == CloudProviderType.Dropbox &&
-                        x.ProviderItemId == file.Id,
-                    cancellationToken);
-
-            if (existing == null)
-            {
-                existing = await _db.StorageReferences
-                    .FirstOrDefaultAsync(
-                        x =>
-                            x.CloudProviderAccountId == account.Id &&
-                            x.Provider == CloudProviderType.Dropbox &&
-                            x.ProviderPath != null &&
-                            x.ProviderPath.ToLower() == normalizedProviderPath,
-                        cancellationToken);
-            }
-
-            string metadataJson = JsonSerializer.Serialize(new
-            {
-                dropbox_content_hash = file.ContentHash,
-                dropbox_path_lower = file.PathLower,
-                dropbox_client_modified = file.ClientModified,
-                dropbox_server_modified = file.ServerModified
-            });
-
-            if (existing == null)
-            {
-                existing = new StorageReference
+                catch
                 {
-                    UserId = account.UserId,
-                    CloudProviderAccountId = account.Id,
-                    Provider = CloudProviderType.Dropbox,
-
-                    ProviderItemId = file.Id,
-                    ProviderPath = file.PathDisplay,
-                    Name = file.Name,
-                    ProviderRevision = file.Rev,
-
-                    MimeType = "video/mp4",
-                    SizeBytes = file.Size,
-                    ProviderModifiedAtUtc = file.ServerModified,
-
-                    LastSeenAtUtc = scanStartedAtUtc,
-                    State = StorageReferenceState.Active,
-                    MetadataJson = metadataJson
-                };
-
-                _db.StorageReferences.Add(existing);
+                }
             }
-            else
-            {
-                existing.ProviderItemId = file.Id;
-                existing.ProviderPath = file.PathDisplay;
-                existing.Name = file.Name;
-                existing.ProviderRevision = file.Rev;
-
-                existing.MimeType = "video/mp4";
-                existing.SizeBytes = file.Size;
-                existing.ProviderModifiedAtUtc = file.ServerModified;
-
-                existing.LastSeenAtUtc = scanStartedAtUtc;
-                existing.State = StorageReferenceState.Active;
-                existing.MetadataJson = metadataJson;
-            }
-
-            return existing;
         }
 
         private async Task<FileContent> UpsertFileContentAsync(string sha256, DropboxFileEntry dropboxFile, MediaMetadata metadata,
@@ -332,6 +386,82 @@ namespace FMVideoManagerApi.Services
             await _db.SaveChangesAsync(cancellationToken);
 
             return node.FileItem!;
+        }
+
+        private async Task<StorageReference> UpsertStorageReferenceAsync(CloudProviderAccount account, DropboxFileEntry file, DateTime scanStartedAtUtc,
+            CancellationToken cancellationToken)
+        {
+            string normalizedProviderPath = NormalizeDropboxPath(file.PathLower ?? file.PathDisplay ?? file.Name);
+
+            StorageReference? existing = await _db.StorageReferences
+                .FirstOrDefaultAsync(
+                    x =>
+                        x.CloudProviderAccountId == account.Id &&
+                        x.Provider == CloudProviderType.Dropbox &&
+                        x.ProviderItemId == file.Id,
+                    cancellationToken);
+
+            if (existing == null)
+            {
+                existing = await _db.StorageReferences
+                    .FirstOrDefaultAsync(
+                        x =>
+                            x.CloudProviderAccountId == account.Id &&
+                            x.Provider == CloudProviderType.Dropbox &&
+                            x.ProviderPath != null &&
+                            x.ProviderPath.ToLower() == normalizedProviderPath,
+                        cancellationToken);
+            }
+
+            string metadataJson = JsonSerializer.Serialize(new
+            {
+                dropbox_content_hash = file.ContentHash,
+                dropbox_path_lower = file.PathLower,
+                dropbox_client_modified = file.ClientModified,
+                dropbox_server_modified = file.ServerModified
+            });
+
+            if (existing == null)
+            {
+                existing = new StorageReference
+                {
+                    UserId = account.UserId,
+                    CloudProviderAccountId = account.Id,
+                    Provider = CloudProviderType.Dropbox,
+
+                    ProviderItemId = file.Id,
+                    ProviderPath = file.PathDisplay ?? file.PathLower ?? file.Name,
+                    Name = file.Name,
+                    ProviderRevision = file.Rev,
+
+                    MimeType = "video/mp4",
+                    SizeBytes = file.Size,
+                    ProviderModifiedAtUtc = file.ServerModified,
+
+                    LastSeenAtUtc = scanStartedAtUtc,
+                    State = StorageReferenceState.Active,
+                    MetadataJson = metadataJson
+                };
+
+                _db.StorageReferences.Add(existing);
+            }
+            else
+            {
+                existing.ProviderItemId = file.Id;
+                existing.ProviderPath = file.PathDisplay ?? file.PathLower ?? file.Name;
+                existing.Name = file.Name;
+                existing.ProviderRevision = file.Rev;
+
+                existing.MimeType = "video/mp4";
+                existing.SizeBytes = file.Size;
+                existing.ProviderModifiedAtUtc = file.ServerModified;
+
+                existing.LastSeenAtUtc = scanStartedAtUtc;
+                existing.State = StorageReferenceState.Active;
+                existing.MetadataJson = metadataJson;
+            }
+
+            return existing;
         }
 
         private async Task MarkStorageReferenceSyncErrorAsync(CloudProviderAccount account, DropboxFileEntry file, DateTime scanStartedAtUtc, string error,

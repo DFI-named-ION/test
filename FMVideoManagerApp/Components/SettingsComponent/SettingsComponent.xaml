@@ -25,7 +25,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!--search bar-->
+        <!--search bar--><!--
         <StackPanel
             Grid.Row="0" Grid.Column="1"
             Orientation="Horizontal"
@@ -38,7 +38,7 @@
                 Width="175px"
                 Margin="15px 0px"
                 Text="Search by tag" />
-        </StackPanel>
+        </StackPanel>-->
         
         <!--settings-->
         <ScrollViewer

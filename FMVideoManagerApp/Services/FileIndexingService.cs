@@ -1,6 +1,7 @@
 ﻿using FFMpegCore;
 using FMVideoManagerApp.Core;
 using FMVideoManagerApp.Data.DTO;
+using FMVideoManagerApp.Data.DTO.Indexing;
 using FMVideoManagerApp.Data.Repositories.LocalFileLocationRepository;
 using FMVideoManagerApp.Models;
 using System.IO;
@@ -16,9 +17,6 @@ namespace FMVideoManagerApp.Services
         private readonly ILocalFileLocationRepository _fileLocationRepository;
         private readonly ApiClient _apiClient;
 
-        private CancellationTokenSource? _indexingCts;
-
-        public FileIndexingState State { get; } = new();
 
         public event Action<LocalFileLocation>? FileProcessed;
         public event Action<string, string>? FileProcessingFailed;
@@ -33,19 +31,8 @@ namespace FMVideoManagerApp.Services
             _apiClient = apiClient;
         }
 
-        public async Task StartIndexingAsync(CancellationToken cancellationToken = default)
+        public async Task StartIndexingAsync(IProgress<IndexingProgress>? progress = null, CancellationToken cancellationToken = default)
         {
-            if (State.IsIndexing)
-                return;
-
-            RunOnUiThread(() =>
-            {
-                State.Reset();
-                State.IsIndexing = true;
-                State.IsIndeterminate = true;
-                State.StatusMessage = "Searching for files...";
-            });
-
             long serverUserId = _authService.GetCurrentUserId();
 
             List<LocalIndexedPath> indexedPaths = _indexedPathService
@@ -54,54 +41,30 @@ namespace FMVideoManagerApp.Services
                 .ToList();
 
             if (indexedPaths.Count == 0)
-            {
-                RunOnUiThread(() =>
-                {
-                    State.IsIndexing = false;
-                    State.IsIndeterminate = false;
-                });
-
                 throw new InvalidOperationException("No indexing paths configured.");
-            }
 
-            _indexingCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            CancellationToken indexingToken = _indexingCts.Token;
-
-            try
-            {
-                await Task.Run(
-                    () => RunIndexingAsync(serverUserId, indexedPaths, indexingToken),
-                    indexingToken);
-            }
-            catch (OperationCanceledException)
-            {
-                RunOnUiThread(() =>
-                {
-                    State.StatusMessage = "Indexing cancelled.";
-                });
-            }
-            finally
-            {
-                RunOnUiThread(() =>
-                {
-                    State.IsIndexing = false;
-                    State.IsIndeterminate = false;
-                });
-
-                _indexingCts.Dispose();
-                _indexingCts = null;
-            }
+            await Task.Run(
+                async () => await RunIndexingAsync(
+                    serverUserId,
+                    indexedPaths,
+                    progress,
+                    cancellationToken),
+                cancellationToken);
         }
 
-        public void CancelIndexing()
-        {
-            _indexingCts?.Cancel();
-        }
 
-        private async Task RunIndexingAsync(long serverUserId, List<LocalIndexedPath> indexedPaths,
+        private async Task RunIndexingAsync(long serverUserId, List<LocalIndexedPath> indexedPaths, IProgress<IndexingProgress>? progress,
             CancellationToken cancellationToken)
         {
-            SetIndexingStatus(0, 0, 0, null, true, "Searching for files...");
+            progress?.Report(new IndexingProgress
+            {
+                TotalFiles = 0,
+                ProcessedFiles = 0,
+                FailedFiles = 0,
+                CurrentFilePath = null,
+                IsIndeterminate = true,
+                StatusMessage = "Searching for files..."
+            });
 
             List<FileInfo> files = CollectFiles(indexedPaths, cancellationToken);
 
@@ -109,7 +72,15 @@ namespace FMVideoManagerApp.Services
             int processed = 0;
             int failed = 0;
 
-            SetIndexingStatus(total, 0, 0, null, false, $"Found {total} files.");
+            progress?.Report(new IndexingProgress
+            {
+                TotalFiles = total,
+                ProcessedFiles = 0,
+                FailedFiles = 0,
+                CurrentFilePath = null,
+                IsIndeterminate = false,
+                StatusMessage = $"Found {total} files."
+            });
 
             foreach (FileInfo file in files)
             {
@@ -123,16 +94,40 @@ namespace FMVideoManagerApp.Services
                     {
                         processed++;
 
-                        SetIndexingStatus(total, processed, failed, file.FullName, false, $"Skipped {processed}/{total}");
+                        progress?.Report(new IndexingProgress
+                        {
+                            TotalFiles = total,
+                            ProcessedFiles = processed,
+                            FailedFiles = failed,
+                            CurrentFilePath = file.FullName,
+                            IsIndeterminate = false,
+                            StatusMessage = $"Skipped {processed}/{total}"
+                        });
 
                         continue;
                     }
 
-                    SetIndexingStatus(total, processed, failed, file.FullName, false, $"Indexing {file.Name}...");
+                    progress?.Report(new IndexingProgress
+                    {
+                        TotalFiles = total,
+                        ProcessedFiles = processed,
+                        FailedFiles = failed,
+                        CurrentFilePath = file.FullName,
+                        IsIndeterminate = false,
+                        StatusMessage = $"Indexing {file.Name}..."
+                    });
 
                     LocalFileLocation indexedFile = IndexFileLocally(serverUserId, ownerPath.Id, file);
 
-                    SetIndexingStatus(total, processed, failed, file.FullName, false, $"Syncing {file.Name} with server...");
+                    progress?.Report(new IndexingProgress
+                    {
+                        TotalFiles = total,
+                        ProcessedFiles = processed,
+                        FailedFiles = failed,
+                        CurrentFilePath = file.FullName,
+                        IsIndeterminate = false,
+                        StatusMessage = $"Syncing {file.Name} with server..."
+                    });
 
                     LocalFileLocation syncedFile = await TryRegisterLocalFileLocationOnServerAsync(indexedFile, cancellationToken);
 
@@ -140,7 +135,15 @@ namespace FMVideoManagerApp.Services
 
                     PublishProcessedFile(syncedFile);
 
-                    SetIndexingStatus(total, processed, failed, file.FullName, false, $"Indexed {processed}/{total}");
+                    progress?.Report(new IndexingProgress
+                    {
+                        TotalFiles = total,
+                        ProcessedFiles = processed,
+                        FailedFiles = failed,
+                        CurrentFilePath = file.FullName,
+                        IsIndeterminate = false,
+                        StatusMessage = $"Indexed {processed}/{total}"
+                    });
                 }
                 catch (OperationCanceledException)
                 {
@@ -153,17 +156,29 @@ namespace FMVideoManagerApp.Services
 
                     PublishFailedFile(file.FullName, ex.Message);
 
-                    SetIndexingStatus(
-                        total,
-                        processed,
-                        failed,
-                        file.FullName,
-                        false,
-                        $"Failed {failed} file(s). Indexed {processed}/{total}");
+                    progress?.Report(new IndexingProgress
+                    {
+                        TotalFiles = total,
+                        ProcessedFiles = processed,
+                        FailedFiles = failed,
+                        CurrentFilePath = file.FullName,
+                        IsIndeterminate = false,
+                        StatusMessage = $"Failed {failed} file(s). Indexed {processed}/{total}"
+                    });
                 }
             }
 
-            SetIndexingCompleted(total, failed);
+            progress?.Report(new IndexingProgress
+            {
+                TotalFiles = total,
+                ProcessedFiles = total,
+                FailedFiles = failed,
+                CurrentFilePath = null,
+                IsIndeterminate = false,
+                StatusMessage = failed == 0
+                    ? "Local indexing completed."
+                    : $"Local indexing completed with {failed} failed file(s)."
+            });
         }
 
         private static List<FileInfo> CollectFiles(List<LocalIndexedPath> indexedPaths, CancellationToken cancellationToken)
@@ -291,9 +306,7 @@ namespace FMVideoManagerApp.Services
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                LocalFileLocation syncedFile = await TryRegisterLocalFileLocationOnServerAsync(
-                    file,
-                    cancellationToken);
+                LocalFileLocation syncedFile = await TryRegisterLocalFileLocationOnServerAsync(file, cancellationToken);
 
                 processed++;
 
@@ -315,8 +328,7 @@ namespace FMVideoManagerApp.Services
             });
         }
 
-        private async Task<LocalFileLocation> TryRegisterLocalFileLocationOnServerAsync(LocalFileLocation localFile,
-            CancellationToken cancellationToken)
+        private async Task<LocalFileLocation> TryRegisterLocalFileLocationOnServerAsync(LocalFileLocation localFile, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(localFile.ContentHash))
             {
@@ -396,45 +408,13 @@ namespace FMVideoManagerApp.Services
 
         private LocalFileLocation MarkLocalFileSyncFailed(LocalFileLocation localFile, string error)
         {
-            _fileLocationRepository.MarkSyncFailed(
-                localFile.Id,
-                localFile.ServerUserId,
-                error);
+            _fileLocationRepository.MarkSyncFailed(localFile.Id, localFile.ServerUserId, error);
 
             localFile.SyncState = LocalFileSyncState.SyncFailed;
             localFile.LastSyncError = error;
             localFile.LastSyncedAtUtc = null;
 
             return localFile;
-        }
-
-        private void SetIndexingStatus(int totalFiles, int processedFiles, int failedFiles, string? currentFilePath,
-            bool isIndeterminate, string statusMessage)
-        {
-            PostToUiThread(() =>
-            {
-                State.TotalFiles = totalFiles;
-                State.ProcessedFiles = processedFiles;
-                State.FailedFiles = failedFiles;
-                State.CurrentFilePath = currentFilePath;
-                State.IsIndeterminate = isIndeterminate;
-                State.StatusMessage = statusMessage;
-            });
-        }
-
-        private void SetIndexingCompleted(int totalFiles, int failedFiles)
-        {
-            PostToUiThread(() =>
-            {
-                State.TotalFiles = totalFiles;
-                State.ProcessedFiles = totalFiles;
-                State.FailedFiles = failedFiles;
-                State.CurrentFilePath = null;
-                State.IsIndeterminate = false;
-                State.StatusMessage = failedFiles == 0
-                    ? "Indexing completed."
-                    : $"Indexing completed with {failedFiles} failed file(s).";
-            });
         }
 
         private void PublishProcessedFile(LocalFileLocation file)
@@ -451,20 +431,6 @@ namespace FMVideoManagerApp.Services
             {
                 FileProcessingFailed?.Invoke(path, error);
             });
-        }
-
-        private static void RunOnUiThread(Action action)
-        {
-            var dispatcher = Application.Current.Dispatcher;
-
-            if (dispatcher.CheckAccess())
-            {
-                action();
-            }
-            else
-            {
-                dispatcher.Invoke(action);
-            }
         }
 
         private static void PostToUiThread(Action action)

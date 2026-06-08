@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FMVideoManagerApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0529b2e0f7282f5dbf8d78478d754e0e819cb097")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d6626d58f9c1cd8abfe1b6f54f1388d4906bf51a")]
 [assembly: System.Reflection.AssemblyProductAttribute("FMVideoManagerApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FMVideoManagerApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

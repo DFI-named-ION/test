@@ -14,11 +14,12 @@ namespace FMVideoManagerApp.ViewModels
         private readonly ApiClient _apiClient;
         private readonly TagService _tagService;
         private readonly FileIndexingService _fileIndexingService;
+        private readonly IndexingManagerService _indexingManager;
         private readonly HierarchyService _hierarchyService;
 
         public FileLibraryService Library { get; }
         public HierarchyService Hierarchy => _hierarchyService;
-        public FileIndexingState Indexing => _fileIndexingService.State;
+        public FileIndexingState Indexing => _indexingManager.State;
 
         private HierarchyItemViewModel? _selectedEntry;
         public HierarchyItemViewModel? SelectedEntry
@@ -145,22 +146,23 @@ namespace FMVideoManagerApp.ViewModels
         public ICommand SaveSelectedNodeNotesCommand { get; }
 
         public ICommand StartLocalIndexingCommand { get; }
-        public ICommand CancelLocalIndexingCommand { get; }
+        public ICommand CancelIndexingCommand { get; }
         public ICommand SyncPendingLocalFilesCommand { get; }
         public ICommand StartCloudIndexingCommand { get; }
 
-        public FileListViewModel(MessageService messageService, ApiClient apiClient, FileIndexingService fileIndexingService, FileLibraryService library,
-            HierarchyService hierarchyService, TagService tagService)
+        public FileListViewModel(MessageService messageService, ApiClient apiClient, FileIndexingService fileIndexingService,
+            IndexingManagerService indexingManager, FileLibraryService library, HierarchyService hierarchyService, TagService tagService)
         {
             _messageService = messageService;
             _apiClient = apiClient;
             _fileIndexingService = fileIndexingService;
+            _indexingManager = indexingManager;
             Library = library;
             _hierarchyService = hierarchyService;
             _tagService = tagService;
 
             StartLocalIndexingCommand = new RelayCommand(async _ => await StartLocalIndexingAsync());
-            CancelLocalIndexingCommand = new RelayCommand(_ => CancelLocalIndexing());
+            CancelIndexingCommand = new RelayCommand(_ => CancelIndexing());
             SyncPendingLocalFilesCommand = new RelayCommand(async _ => await SyncPendingFilesAsync());
             StartCloudIndexingCommand = new RelayCommand(async _ => await StartCloudIndexingAsync());
 
@@ -250,7 +252,7 @@ namespace FMVideoManagerApp.ViewModels
             {
                 _messageService.ShowMessage("Local indexing has started.");
 
-                await _fileIndexingService.StartIndexingAsync();
+                await _indexingManager.StartLocalIndexingAsync();
 
                 await RefreshAfterIndexingAsync();
 
@@ -261,11 +263,28 @@ namespace FMVideoManagerApp.ViewModels
                 _messageService.ShowError($"Error happened during local indexing: {ex.Message}");
             }
         }
-
-        private void CancelLocalIndexing()
+        private async Task StartCloudIndexingAsync()
         {
-            _fileIndexingService.CancelIndexing();
-            _messageService.ShowMessage("Local indexing canceled.");
+            try
+            {
+                _messageService.ShowMessage("Cloud indexing has started.");
+
+                await _indexingManager.StartCloudIndexingAsync();
+
+                await RefreshAfterIndexingAsync();
+
+                _messageService.ShowMessage("Cloud indexing finished.");
+            }
+            catch (Exception ex)
+            {
+                _messageService.ShowError($"Error happened during cloud indexing: {ex.Message}");
+            }
+        }
+
+        private void CancelIndexing()
+        {
+            _indexingManager.CancelIndexingAsync();
+            _messageService.ShowMessage("Indexing cancellation requested.");
         }
 
         private async Task SyncPendingFilesAsync()
@@ -281,41 +300,6 @@ namespace FMVideoManagerApp.ViewModels
             catch (Exception ex)
             {
                 _messageService.ShowError($"Error happened during local sync: {ex.Message}");
-            }
-        }
-
-        private async Task StartCloudIndexingAsync() // move, fix
-        {
-            try
-            {
-                List<CloudProviderAccountDto> accounts = await _apiClient.GetCloudAccountsAsync();
-
-                List<CloudProviderAccountDto> activeDropboxAccounts = accounts
-                    .Where(x =>
-                        x.Provider == CloudProviderType.Dropbox &&
-                        x.IsActive)
-                    .ToList();
-
-                if (activeDropboxAccounts.Count == 0)
-                {
-                    _messageService.ShowWarning("No active Dropbox accounts connected.");
-                    return;
-                }
-
-                foreach (CloudProviderAccountDto account in activeDropboxAccounts)
-                {
-                    _messageService.ShowMessage($"Cloud indexing for {account.DisplayName ?? account.Email} has started.");
-
-                    await _apiClient.IndexDropboxAccountAsync(account.Id);
-                }
-
-                await RefreshAfterIndexingAsync();
-
-                _messageService.ShowMessage("Cloud indexing finished.");
-            }
-            catch (Exception ex)
-            {
-                _messageService.ShowError($"Error happened during cloud indexing: {ex.Message}");
             }
         }
 

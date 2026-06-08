@@ -1,5 +1,6 @@
 ﻿using FMVideoManagerApi.Data;
 using FMVideoManagerApi.Data.DTO.Dropbox;
+using FMVideoManagerApi.Data.DTO.Indexing;
 using FMVideoManagerApi.Models;
 using FMVideoManagerApi.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -22,18 +23,17 @@ namespace FMVideoManagerApi.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IDataProtector _stateProtector;
         private readonly TokenProtector _tokenProtector;
-        private readonly DropboxStorageIndexingService _indexingService;
+        private readonly CloudIndexingJobService _cloudIndexingJobService;
 
-        public DropboxCloudController(ServerDbContext db, IOptions<DropboxOptions> dropboxOptions,
-            IHttpClientFactory httpClientFactory, IDataProtectionProvider dataProtectionProvider,
-            TokenProtector tokenProtector, DropboxStorageIndexingService indexingService)
+        public DropboxCloudController(ServerDbContext db, IOptions<DropboxOptions> dropboxOptions, IHttpClientFactory httpClientFactory,
+            IDataProtectionProvider dataProtectionProvider, TokenProtector tokenProtector, CloudIndexingJobService cloudIndexingJobService)
         {
             _db = db;
             _dropboxOptions = dropboxOptions.Value;
             _httpClientFactory = httpClientFactory;
             _stateProtector = dataProtectionProvider.CreateProtector("FMVideoManager.DropboxOAuthState.v1");
             _tokenProtector = tokenProtector;
-            _indexingService = indexingService;
+            _cloudIndexingJobService = cloudIndexingJobService;
         }
 
         [Authorize]
@@ -76,8 +76,8 @@ namespace FMVideoManagerApi.Controllers
 
         [AllowAnonymous]
         [HttpGet("callback")]
-        public async Task<IActionResult> Callback([FromQuery] string? code, [FromQuery] string? state,
-            [FromQuery] string? error, CancellationToken cancellationToken)
+        public async Task<IActionResult> Callback([FromQuery] string? code, [FromQuery] string? state, [FromQuery] string? error,
+            CancellationToken cancellationToken)
         {
             try
             {
@@ -188,46 +188,32 @@ namespace FMVideoManagerApi.Controllers
         }
 
         [Authorize]
-        [HttpPost("accounts/{accountId:long}/index")]
-        public async Task<IActionResult> IndexDropboxAccount(long accountId, CancellationToken cancellationToken)
+        [HttpPost("accounts/{accountId:long}/index/start")]
+        public async Task<ActionResult<StartCloudIndexingJobResponse>> StartDropboxIndexing(long accountId, CancellationToken cancellationToken)
         {
             if (!TryGetCurrentUserId(out long userId))
                 return Unauthorized();
 
-            CloudProviderAccount? account = await _db.CloudProviderAccounts
-                .FirstOrDefaultAsync(
-                    x =>
-                        x.Id == accountId &&
-                        x.UserId == userId &&
-                        x.Provider == CloudProviderType.Dropbox,
-                    cancellationToken);
+            bool accountExists = await _db.CloudProviderAccounts.AnyAsync(
+                x =>
+                    x.Id == accountId &&
+                    x.UserId == userId &&
+                    x.Provider == CloudProviderType.Dropbox &&
+                    x.IsActive,
+                cancellationToken);
 
-            if (account == null)
-                return NotFound("Dropbox account not found.");
+            if (!accountExists)
+                return NotFound("Active Dropbox account not found.");
 
-            if (!account.IsActive)
-                return BadRequest("Dropbox account is disabled.");
+            Guid jobId = _cloudIndexingJobService.StartDropboxIndexing(userId, accountId);
 
-            try
+            return Ok(new StartCloudIndexingJobResponse
             {
-                DropboxIndexResult result = await _indexingService.IndexAsync(account, cancellationToken);
-
-                return Ok(result);
-            }
-            catch (OperationCanceledException)
-            {
-                return BadRequest("Dropbox indexing was cancelled.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-
-                return BadRequest($"Dropbox indexing failed: {ex.Message}");
-            }
+                JobId = jobId
+            });
         }
 
-        private async Task<DropboxTokenResponse> ExchangeCodeForTokenAsync(string code,
-            CancellationToken cancellationToken)
+        private async Task<DropboxTokenResponse> ExchangeCodeForTokenAsync(string code, CancellationToken cancellationToken)
         {
             using HttpClient client = _httpClientFactory.CreateClient();
 

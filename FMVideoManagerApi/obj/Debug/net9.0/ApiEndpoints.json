@@ -141,8 +141,8 @@
   },
   {
     "ContainingType": "FMVideoManagerApi.Controllers.DropboxCloudController",
-    "Method": "IndexDropboxAccount",
-    "RelativePath": "api/cloud/dropbox/accounts/{accountId}/index",
+    "Method": "StartDropboxIndexing",
+    "RelativePath": "api/cloud/dropbox/accounts/{accountId}/index/start",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -153,7 +153,17 @@
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "FMVideoManagerApi.Data.DTO.Indexing.StartCloudIndexingJobResponse",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "FMVideoManagerApi.Controllers.DropboxCloudController",
@@ -192,6 +202,68 @@
     "ReturnTypes": [
       {
         "Type": "FMVideoManagerApi.Data.DTO.Dropbox.StartDropboxConnectResponse",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.CloudIndexingController",
+    "Method": "GetCloudIndexingJob",
+    "RelativePath": "api/cloud/indexing/jobs/{jobId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "jobId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "FMVideoManagerApi.Data.DTO.Indexing.CloudIndexingJobDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.CloudIndexingController",
+    "Method": "CancelCloudIndexingJob",
+    "RelativePath": "api/cloud/indexing/jobs/{jobId}/cancel",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "jobId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.CloudIndexingController",
+    "Method": "GetActiveCloudIndexingJob",
+    "RelativePath": "api/cloud/indexing/jobs/active",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "FMVideoManagerApi.Data.DTO.Indexing.CloudIndexingJobDto",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -257,13 +329,13 @@
     "Parameters": [
       {
         "Name": "request",
-        "Type": "FMVideoManagerApi.Data.DTO.RegisterLocalFileRequest",
+        "Type": "FMVideoManagerApi.Data.DTO.Indexing.RegisterLocalFileRequest",
         "IsRequired": true
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "FMVideoManagerApi.Data.DTO.RegisterLocalFileResponse",
+        "Type": "FMVideoManagerApi.Data.DTO.Indexing.RegisterLocalFileResponse",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -308,6 +380,37 @@
       }
     ],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FMVideoManagerApi.Controllers.HierarchyController",
+    "Method": "CopyNode",
+    "RelativePath": "api/hierarchy/{nodeId}/copy",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "nodeId",
+        "Type": "System.Int64",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "FMVideoManagerApi.Data.DTO.Hierarchy.MoveNodeRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "FMVideoManagerApi.Data.DTO.Hierarchy.CopyNodeResponse",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "FMVideoManagerApi.Controllers.HierarchyController",

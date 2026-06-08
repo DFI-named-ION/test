@@ -1,5 +1,6 @@
 ﻿using FMVideoManagerApp.Data.DTO;
 using FMVideoManagerApp.Data.DTO.Hierarchy;
+using FMVideoManagerApp.Data.DTO.Indexing;
 using FMVideoManagerApp.Data.DTO.Tags;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -212,21 +213,50 @@ namespace FMVideoManagerApp.Services
             }
         }
 
-        public async Task<DropboxIndexResult> IndexDropboxAccountAsync(long accountId, CancellationToken cancellationToken = default)
+        public async Task<Guid> StartDropboxIndexingAsync(long accountId, CancellationToken cancellationToken = default)
         {
-            using HttpRequestMessage request = CreateAuthorizedRequest(HttpMethod.Post, $"api/cloud/dropbox/accounts/{accountId}/index");
+            using HttpRequestMessage request = CreateAuthorizedRequest(HttpMethod.Post, $"api/cloud/dropbox/accounts/{accountId}/index/start");
             using HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {
                 string errorMessage = await ReadErrorMessageAsync(response, cancellationToken);
-
                 throw new InvalidOperationException(errorMessage);
             }
 
-            DropboxIndexResult? result = await response.Content.ReadFromJsonAsync<DropboxIndexResult>(cancellationToken);
+            StartCloudIndexingJobResponse? result = await response.Content.ReadFromJsonAsync<StartCloudIndexingJobResponse>(cancellationToken);
 
-            return result ?? throw new InvalidOperationException("Empty Dropbox index response.");
+            return result?.JobId ?? throw new InvalidOperationException("Empty start cloud indexing response.");
+        }
+
+        public async Task<CloudIndexingJobDto> GetCloudIndexingJobAsync(Guid jobId, CancellationToken cancellationToken = default)
+        {
+            using HttpRequestMessage request = CreateAuthorizedRequest(HttpMethod.Get, $"api/cloud/indexing/jobs/{jobId}");
+
+            using HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                string errorMessage = await ReadErrorMessageAsync(response, cancellationToken);
+                throw new InvalidOperationException(errorMessage);
+            }
+
+            CloudIndexingJobDto? result = await response.Content.ReadFromJsonAsync<CloudIndexingJobDto>(cancellationToken);
+
+            return result ?? throw new InvalidOperationException("Empty cloud indexing job response.");
+        }
+
+        public async Task CancelCloudIndexingJobAsync(Guid jobId, CancellationToken cancellationToken = default)
+        {
+            using HttpRequestMessage request = CreateAuthorizedRequest(HttpMethod.Post, $"api/cloud/indexing/jobs/{jobId}/cancel");
+
+            using HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                string errorMessage = await ReadErrorMessageAsync(response, cancellationToken);
+                throw new InvalidOperationException(errorMessage);
+            }
         }
 
         public async Task<List<HierarchyNodeDto>> GetHierarchyAsync(CancellationToken cancellationToken = default)
@@ -351,6 +381,30 @@ namespace FMVideoManagerApp.Services
 
                 throw new InvalidOperationException(errorMessage);
             }
+        }
+
+        public async Task<CopyNodeResponse> CopyNodeAsync(long nodeId, long? targetParentNodeId, int? sortOrder = null,
+            CancellationToken cancellationToken = default)
+        {
+            using HttpRequestMessage request = CreateAuthorizedRequest(HttpMethod.Post, $"api/hierarchy/{nodeId}/copy");
+
+            request.Content = JsonContent.Create(new MoveNodeRequest
+            {
+                NewParentNodeId = targetParentNodeId,
+                SortOrder = sortOrder
+            });
+
+            using HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                string errorMessage = await ReadErrorMessageAsync(response, cancellationToken);
+                throw new InvalidOperationException(errorMessage);
+            }
+
+            CopyNodeResponse? result = await response.Content.ReadFromJsonAsync<CopyNodeResponse>(cancellationToken);
+
+            return result ?? throw new InvalidOperationException("Empty copy node response.");
         }
 
         public async Task DeleteNodeAsync(long nodeId, CancellationToken cancellationToken = default)

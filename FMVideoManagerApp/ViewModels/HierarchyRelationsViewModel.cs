@@ -21,6 +21,8 @@ namespace FMVideoManagerApp.ViewModels
         public ObservableCollection<HierarchyItemViewModel> ItemsLeft { get; } = new();
         public ObservableCollection<HierarchyItemViewModel> ItemsRight { get; } = new();
 
+        public bool IsMakeCopyChecked { get; set; }
+
         private HierarchyParentOptionViewModel? _selectedParentItemLeft;
         public HierarchyParentOptionViewModel? SelectedParentItemLeft
         {
@@ -341,6 +343,12 @@ namespace FMVideoManagerApp.ViewModels
             if (SelectedParentItemRight == null)
                 return;
 
+            if (IsMakeCopyChecked)
+            {
+                await MoveCopyAsync(SelectedItemLeft, SelectedParentItemRight.NodeId);
+                return;
+            }
+
             await MoveAsync(SelectedItemLeft, SelectedParentItemRight.NodeId);
         }
 
@@ -352,7 +360,53 @@ namespace FMVideoManagerApp.ViewModels
             if (SelectedParentItemLeft == null)
                 return;
 
+            if (IsMakeCopyChecked)
+            {
+                await MoveCopyAsync(SelectedItemRight, SelectedParentItemLeft.NodeId);
+                return;
+            }
+
             await MoveAsync(SelectedItemRight, SelectedParentItemLeft.NodeId);
+        }
+
+        private async Task MoveCopyAsync(HierarchyItemViewModel item, long? targetParentNodeId)
+        {
+            try
+            {
+                if (item.Id == targetParentNodeId)
+                {
+                    _messageService.ShowWarning("Cannot copy item into itself.");
+                    return;
+                }
+
+                if (item.ParentNodeId == targetParentNodeId)
+                {
+                    _messageService.ShowWarning("Item is already in that location.");
+                    return;
+                }
+
+                long? selectedLeftParentId = SelectedParentItemLeft?.NodeId;
+                long? selectedRightParentId = SelectedParentItemRight?.NodeId;
+
+                await _hierarchyService.CopyNodeAsync(item.Id, targetParentNodeId);
+
+                RebuildParentLists();
+
+                SelectedParentItemLeft = ParentItemsLeft.FirstOrDefault(x => x.NodeId == selectedLeftParentId);
+                SelectedParentItemRight = ParentItemsRight.FirstOrDefault(x => x.NodeId == selectedRightParentId);
+
+                RebuildLeftItems();
+                RebuildRightItems();
+
+                SelectedItemLeft = null;
+                SelectedItemRight = null;
+
+                _messageService.ShowMessage("Item copied.");
+            }
+            catch (Exception ex)
+            {
+                _messageService.ShowError(ex.Message);
+            }
         }
 
         private async Task MoveAsync(HierarchyItemViewModel item, long? targetParentNodeId)

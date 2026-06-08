@@ -231,6 +231,82 @@ namespace FMVideoManagerApi.Controllers
             return NoContent();
         }
 
+        [Authorize]
+        [HttpPost("{nodeId:long}/copy")]
+        public async Task<ActionResult<CopyNodeResponse>> CopyNode(long nodeId, MoveNodeRequest request, CancellationToken cancellationToken)
+        {
+            if (!TryGetCurrentUserId(out long userId))
+                return Unauthorized();
+
+            HierarchyNode? sourceNode = await _db.HierarchyNodes
+                .Include(x => x.FileItem)
+                .FirstOrDefaultAsync(
+                    x =>
+                        x.Id == nodeId &&
+                        x.UserId == userId,
+                    cancellationToken);
+
+            if (sourceNode == null)
+                return NotFound("Node not found.");
+
+            if (sourceNode.NodeType != HierarchyNodeType.File)
+                return BadRequest("Only file nodes can be copied for now.");
+
+            if (sourceNode.FileItem == null)
+                return BadRequest("File item is missing.");
+
+            if (request.NewParentNodeId != null)
+            {
+                bool targetParentExists = await _db.HierarchyNodes.AnyAsync(
+                    x =>
+                        x.Id == request.NewParentNodeId.Value &&
+                        x.UserId == userId &&
+                        x.NodeType == HierarchyNodeType.Group,
+                    cancellationToken);
+
+                if (!targetParentExists)
+                    return BadRequest("Target parent must be an existing group.");
+            }
+
+            DateTime now = DateTime.UtcNow;
+
+            string title = sourceNode.ParentNodeId == request.NewParentNodeId
+                ? $"{sourceNode.Title} - Copy"
+                : sourceNode.Title;
+
+            var copiedNode = new HierarchyNode
+            {
+                UserId = userId,
+                ParentNodeId = request.NewParentNodeId,
+                NodeType = HierarchyNodeType.File,
+                Title = title,
+                SortOrder = request.SortOrder ?? sourceNode.SortOrder,
+                CreatedAtUtc = now,
+                UpdatedAtUtc = now,
+
+                FileItem = new FileItem
+                {
+                    ContentHash = sourceNode.FileItem.ContentHash,
+                    OriginalFilename = sourceNode.FileItem.OriginalFilename,
+                    Notes = sourceNode.FileItem.Notes,
+                    // StorageReferences = sourceNode.FileItem.StorageReferences, 
+                    CreatedAtUtc = now,
+                    UpdatedAtUtc = now
+                }
+            };
+
+            _db.HierarchyNodes.Add(copiedNode);
+
+            await _db.SaveChangesAsync(cancellationToken);
+
+            return Ok(new CopyNodeResponse
+            {
+                NodeId = copiedNode.Id,
+                ParentNodeId = copiedNode.ParentNodeId,
+                Title = copiedNode.Title
+            });
+        }
+
         [HttpPatch("{nodeId:long}/description")]
         public async Task<IActionResult> UpdateNodeDescription(long nodeId, UpdateNodeDescriptionRequest request, CancellationToken cancellationToken)
         {

@@ -112,11 +112,12 @@
 
                                     <!-- move left/right -->
                                     <Border
-                                            Margin="0px 125px 0px 0px"
+                                            Margin="0px 75px 0px 0px"
                                             Padding="0px 5px"
                                             BorderThickness="0px 5px"
                                             BorderBrush="{StaticResource BaseColor3}">
                                         <StackPanel>
+                                            
                                             <!-- move right -->
                                             <Button
                                                 Command="{Binding MoveRightCommand}"
@@ -126,6 +127,13 @@
                                                     Width="20px"
                                                     Source="/Resources/Icons/arrow_right.png" />
                                             </Button>
+
+                                            <!--<CheckBox
+                                                HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Center"
+                                                Margin="40px 10px 25px 0px"
+                                                IsChecked="{Binding IsMakeCopyChecked}"
+                                                Content="Make a copy?"/>-->
 
                                             <!-- move left -->
                                             <Button
